@@ -25,14 +25,14 @@ public class DictionaryServiceImpl implements DictionaryService {
 
 
     @Override
-    public Dictionary addDictionary(String dName){
-        if(dName.isEmpty()){
+    public Dictionary addDictionary(String name){
+        if(name.isEmpty()){
             CustomException.cast(CommonCode.INVALID_PARAM);
         }
 
         // Check if dictionary name already exists;
-        Query query = new Query().addCriteria(Criteria.where("dName").is(dName));
-        Dictionary dictionary = dictionaryDao.findDictionaryByDName(query);
+        Query query = new Query().addCriteria(Criteria.where("name").is(name));
+        Dictionary dictionary = dictionaryDao.findByName(query);
 
         if(null != dictionary){
             CustomException.cast(CommonCode.DB_ENTRY_ALREADY_EXIST);
@@ -40,72 +40,60 @@ public class DictionaryServiceImpl implements DictionaryService {
 
         // Add new dictionary to db;
         Dictionary dictionary1 = new Dictionary();
-        dictionary1.setdName(dName);
-        List<String> dvalue = new ArrayList<>();
-        dictionary1.setdValue(dvalue);
+        dictionary1.setName(name);
+        List<String> values = new ArrayList<>();
+        dictionary1.setValues(values);
 
-        return dictionaryDao.addDictionary(dictionary1);
+        return dictionaryDao.save(dictionary1);
     }
 
     @Override
-    public Dictionary updateById(ObjectId id, String dName) {
+    public Dictionary updateById(ObjectId id, String name) {
 
         // check if id exist;
         Dictionary dictionary = this.findById(id);
 
-        // check if new dName already exist;
-        Query query = new Query().addCriteria(Criteria.where("dName").is(dName));
-        Dictionary dictionary1 = dictionaryDao.findDictionaryByDName(query);
+        // check if new dname already exist;
+        Query query = new Query().addCriteria(Criteria.where("name").is(name));
+        Dictionary dictionary1 = dictionaryDao.findByName(query);
 
         if(dictionary1 != null){
             CustomException.cast(CommonCode.DB_ENTRY_ALREADY_EXIST);
         }
 
-        dictionary.setdName(dName);
+        dictionary.setName(name);
 
         return dictionaryDao.save(dictionary);
     }
 
     @Override
-    public Dictionary addValueById(ObjectId id, String dValue) {
-        // check params;
-//        if(null == id || null == dValue){
-//            CustomException.cast(CommonCode.INVALID_PARAM);
-//        }
+    public Dictionary addValueById(ObjectId id, String value) {
 
         // check if dictionary exist, if not, findById method will throw exception;
         Dictionary dictionary = this.findById(id);
 
-        System.out.println(dictionary);
-
-//        Dictionary dictionary = dictionaryDao.findById(id);
-//        if(dictionary == null){
-//            CustomException.cast(CommonCode.DB_ENTRY_NOT_FOUND);
-//        }
-
-
-        // check if value already exist in the dValue list;
-        for(String value: dictionary.getdValue()){
-            if(value.equals(dValue)){
+        // check if value already exist in the values list;
+        for(String value1: dictionary.getValues()){
+            if(value.equals(value1)){
                 CustomException.cast(CommonCode.DB_ENTRY_ALREADY_EXIST);
             }
         }
-        dictionary.getdValue().add(dValue);
+        dictionary.getValues().add(value);
 
         return dictionaryDao.save(dictionary);
     }
 
     @Override
-    public Dictionary deleteValue(ObjectId id, String dValue) {
+    public Dictionary deleteValue(ObjectId id, String value) {
         // check if dictionary exist, if not, findById method will throw exception;
         Dictionary dictionary = this.findById(id);
 
         // check if value already exist in the dValue list;
-        if(!dictionary.getdValue().contains(dValue)){
+        if(!dictionary.getValues().contains(value)){
             CustomException.cast(CommonCode.DB_ENTRY_NOT_FOUND);
         }
 
-        dictionary.getdValue().removeIf(value -> value.equals(dValue));
+        dictionary.getValues().removeIf(value1 -> value1.equals(value));
 
         return dictionaryDao.save(dictionary);
     }
@@ -122,12 +110,11 @@ public class DictionaryServiceImpl implements DictionaryService {
         }
         page = page -1;
 
-        System.out.println("Page = " + page +" Size = "+size);
 
         // list by page and size; default sort by ascending;
         Pageable pageable = PageRequest.of(page, size);
         Query query = new Query();
-        query.with(pageable).with(Sort.by("dName").ascending());
+        query.with(pageable).with(Sort.by("dname").ascending());
         List<Dictionary> list = dictionaryDao.listDictionaries(query);
 
         // check if target not exist or list is empty;
@@ -142,12 +129,12 @@ public class DictionaryServiceImpl implements DictionaryService {
 
 
     @Override
-    public Dictionary findByDName(String dName){
+    public Dictionary findByName(String name){
 
         Query query = new Query();
-        query.addCriteria(Criteria.where("dName").is(dName));
+        query.addCriteria(Criteria.where("name").is(name));
 
-        Dictionary dict = dictionaryDao.findDictionaryByDName(query);
+        Dictionary dict = dictionaryDao.findByName(query);
 
         if(dict == null){
             CustomException.cast(CommonCode.DB_ENTRY_NOT_FOUND);

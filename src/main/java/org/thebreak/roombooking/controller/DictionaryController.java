@@ -19,22 +19,20 @@ public class DictionaryController {
 
 
     @PostMapping(value = "/add")
-    public ResponseResult<Dictionary> addDictionary(@RequestParam String dName){
+    public ResponseResult<Dictionary> addDictionary(@RequestParam String name){
 
-        Dictionary d = dictionaryService.addDictionary(dName);
+        Dictionary d = dictionaryService.addDictionary(name);
         return ResponseResult.success(d);
     }
 
     @GetMapping(value = "/list")
     public ResponseResult<List<Dictionary>> listDictionary(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "5")int size){
-
         return ResponseResult.success(dictionaryService.listDictionary(page, size));
     }
 
-    @GetMapping(value = "/byDname")
-    public ResponseResult<Dictionary> findByDname(@RequestParam String dName){
-        System.out.println(dName);
-        return ResponseResult.success(dictionaryService.findByDName(dName));
+    @GetMapping(value = "/byName")
+    public ResponseResult<Dictionary> findByName(@RequestParam String name){
+        return ResponseResult.success(dictionaryService.findByName(name));
     }
 
     @GetMapping(value = "/byId")
@@ -43,8 +41,8 @@ public class DictionaryController {
     }
 
     @PostMapping(value = "/update")
-    public ResponseResult updateName(@RequestParam ObjectId id, String dName){
-        return ResponseResult.success(dictionaryService.updateById(id, dName));
+    public ResponseResult updateName(@RequestParam ObjectId id, String name){
+        return ResponseResult.success(dictionaryService.updateById(id, name));
     }
     @PostMapping(value = "/delete")
     public ResponseResult deleteById(@RequestParam ObjectId id){
@@ -53,13 +51,13 @@ public class DictionaryController {
     }
 
     @PostMapping(value = "/addValue")
-    public ResponseResult addValue(@RequestParam ObjectId id, String dValue){
-        return ResponseResult.success(dictionaryService.addValueById(id, dValue));
+    public ResponseResult addValue(@RequestParam ObjectId id, String value){
+        return ResponseResult.success(dictionaryService.addValueById(id, value));
     }
 
     @PostMapping(value = "/deleteValue")
-    public ResponseResult deleteValue(@RequestParam ObjectId id, String dValue){
-        return ResponseResult.success(dictionaryService.deleteValue(id, dValue));
+    public ResponseResult deleteValue(@RequestParam ObjectId id, String value){
+        return ResponseResult.success(dictionaryService.deleteValue(id, value));
     }
 
 }

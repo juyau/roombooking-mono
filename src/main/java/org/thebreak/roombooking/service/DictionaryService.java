@@ -9,12 +9,12 @@ import org.thebreak.roombooking.model.response.CommonCode;
 import java.util.List;
 
 public interface DictionaryService {
-    Dictionary addDictionary(String dName);
-    Dictionary updateById(ObjectId id, String dName);
-    Dictionary addValueById(ObjectId id, String dValue);
-    Dictionary deleteValue(ObjectId id, String dValue);
+    Dictionary addDictionary(String name);
+    Dictionary updateById(ObjectId id, String name);
+    Dictionary addValueById(ObjectId id, String value);
+    Dictionary deleteValue(ObjectId id, String value);
     List<Dictionary> listDictionary(int page, int size);
-    Dictionary findByDName(String dName);
+    Dictionary findByName(String name);
     Dictionary findById(ObjectId id);
     CommonCode deleteById(ObjectId id);
 

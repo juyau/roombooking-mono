@@ -35,22 +35,22 @@ class DictionaryServiceImplTest {
 
         //create one dictionary entry for later use
         Dictionary dictionary = new Dictionary();
-        dictionary.setdName("name1");
+        dictionary.setName("name1");
         List<String> list = new ArrayList<>();
         list.add("value1");
         list.add("value2");
-        dictionary.setdValue(list);
+        dictionary.setValues(list);
         Dictionary savedDictionary = mongoTemplate.save(dictionary);
         // get an ObjectId for method tests, such as findById
         oId = new ObjectId(savedDictionary.getId());
 
         //create another dictionary entry for later use
         Dictionary dictionary2 = new Dictionary();
-        dictionary2.setdName("name2");
+        dictionary2.setName("name2");
         List<String> list2 = new ArrayList<>();
         list2.add("value1");
         list2.add("value2");
-        dictionary2.setdValue(list2);
+        dictionary2.setValues(list2);
         Dictionary savedDictionary2 = mongoTemplate.save(dictionary2);
     }
 
@@ -64,7 +64,7 @@ class DictionaryServiceImplTest {
         // then
         assertThat(list.size()).isEqualTo(2);
         for(Dictionary dict: list){
-            assertThat(dict.getdName().contains("name")).isTrue();
+            assertThat(dict.getName().contains("name")).isTrue();
         }
 
     }
@@ -74,10 +74,10 @@ class DictionaryServiceImplTest {
     @Order(2)
     void findByDName() {
         // when
-        Dictionary dict = dictionaryService.findByDName("name1");
+        Dictionary dict = dictionaryService.findByName("name1");
         // then
         assertThat(dict.getId()).isNotNull();
-        assertThat(dict.getdName()).isEqualTo("name1");
+        assertThat(dict.getName()).isEqualTo("name1");
     }
 
     @Test
@@ -87,8 +87,8 @@ class DictionaryServiceImplTest {
         Dictionary dict = dictionaryService.findById(oId);
 
         // then
-        assertThat(dict.getdName()).isEqualTo("name1");
-        assertThat(dict.getdValue().size()).isEqualTo(2);
+        assertThat(dict.getName()).isEqualTo("name1");
+        assertThat(dict.getValues().size()).isEqualTo(2);
     }
 
 
@@ -100,8 +100,8 @@ class DictionaryServiceImplTest {
         Dictionary dictionary = dictionaryService.addValueById(oId, "addedValue");
 
         // then
-        assertThat(dictionary.getdValue().contains("addedValue")).isTrue();
-        assertThat(dictionary.getdValue().size()).isEqualTo(3);
+        assertThat(dictionary.getValues().contains("addedValue")).isTrue();
+        assertThat(dictionary.getValues().size()).isEqualTo(3);
     }
 
     @Test
@@ -111,8 +111,8 @@ class DictionaryServiceImplTest {
         Dictionary dictionary = dictionaryService.deleteValue(oId, "value1");
 
         // then
-        assertThat(dictionary.getdValue().contains("value1")).isFalse();
-        assertThat(dictionary.getdValue().contains("value2")).isTrue();
+        assertThat(dictionary.getValues().contains("value1")).isFalse();
+        assertThat(dictionary.getValues().contains("value2")).isTrue();
     }
 
     @Test
@@ -121,7 +121,7 @@ class DictionaryServiceImplTest {
         // given
         Dictionary dict = dictionaryService.addDictionary("addedName");
         // when
-        String addedName = dict.getdName();
+        String addedName = dict.getName();
 
         // then
         assertThat("addedName").isEqualTo(addedName);
@@ -136,7 +136,7 @@ class DictionaryServiceImplTest {
         Dictionary dict = dictionaryService.updateById(oId,"newName");
 
         // then
-        assertThat(dict.getdName()).isEqualTo("newName");
+        assertThat(dict.getName()).isEqualTo("newName");
         assertThat(dict.getId()).isEqualTo(oId.toString());
     }
 

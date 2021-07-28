@@ -11,11 +11,9 @@ import java.util.List;
 
 public interface DictionaryDao {
     List<Dictionary> listDictionaries(Query query);
-    Dictionary addDictionary(Dictionary dictionary);
-    Dictionary findDictionaryByDName(Query query);
+    Dictionary findByName(Query query);
     Dictionary findById(ObjectId id);
     Dictionary save(Dictionary dictionary);
     DeleteResult delete(Dictionary dictionary);
-
 
 }

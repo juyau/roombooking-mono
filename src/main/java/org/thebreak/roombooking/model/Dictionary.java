@@ -1,5 +1,6 @@
 package org.thebreak.roombooking.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -16,62 +17,25 @@ import java.util.List;
 @Document(value = "dictionary")
 @ToString
 @NoArgsConstructor
+@Data
+@AllArgsConstructor
 public class Dictionary {
     @Id
     private String id;
-    @Field("d_name")
-    private String dName;
-    @Field("d_value")
-    private List<String> dValue;
+
+    @Field("name")
+    private String name;
+
+    @Field("values")
+    private List<String> values;
 
     @CreatedDate
+    @Field("created_at")
     private LocalDateTime createdAt;
 
     @LastModifiedDate
+    @Field("updated_at")
     private LocalDateTime updatedAt;
 
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
 
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public Dictionary(String dName, List<String> dValue) {
-        this.dName = dName;
-        this.dValue = dValue;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getdName() {
-        return dName;
-    }
-
-    public void setdName(String dName) {
-        this.dName = dName;
-    }
-
-    public List<String> getdValue() {
-        return dValue;
-    }
-
-    public void setdValue(List<String> dValue) {
-        this.dValue = dValue;
-    }
 }

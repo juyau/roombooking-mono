@@ -23,12 +23,7 @@ public class DictionaryDaoImpl implements DictionaryDao {
     }
 
     @Override
-    public Dictionary addDictionary(Dictionary dictionary) {
-        return mongoTemplate.insert(dictionary);
-    }
-
-    @Override
-    public Dictionary findDictionaryByDName(Query query) {
+    public Dictionary findByName(Query query) {
         return mongoTemplate.findOne(query, Dictionary.class);
     }
 
@@ -41,6 +36,7 @@ public class DictionaryDaoImpl implements DictionaryDao {
         return  mongoTemplate.save(dictionary);
     }
 
+    @Override
     public DeleteResult delete(Dictionary dictionary) {
         return  mongoTemplate.remove(dictionary);
     }

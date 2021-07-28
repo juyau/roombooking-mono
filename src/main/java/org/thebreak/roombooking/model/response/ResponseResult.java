@@ -2,24 +2,26 @@ package org.thebreak.roombooking.model.response;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 public class ResponseResult<T>  {
 
     private Boolean success;
     private int code;
     private String message;
-    private Long timestamp;
+    private LocalDateTime timestamp;
     private T data;
 
     public ResponseResult(){
-        this.timestamp = System.currentTimeMillis();
+        this.timestamp = LocalDateTime.now();
     }
 
     public ResponseResult(CommonCode commonCode){
         this.success = commonCode.getSuccess();
         this.code = commonCode.getCode();
         this.message = commonCode.getMessage();
-        this.timestamp = System.currentTimeMillis();
+        this.timestamp = LocalDateTime.now();
     }
     public static <T> ResponseResult<T> success(T data){
         ResponseResult<T> responseResult = new ResponseResult<>(CommonCode.SUCCESS);
