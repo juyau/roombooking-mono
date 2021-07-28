@@ -130,7 +130,6 @@ public class DictionaryServiceImpl implements DictionaryService {
         query.with(pageable).with(Sort.by("dName").ascending());
         List<Dictionary> list = dictionaryDao.listDictionaries(query);
 
-        System.out.println(list.toString());
         // check if target not exist or list is empty;
         if(list == null){
             CustomException.cast(CommonCode.DB_ENTRY_NOT_FOUND);
