@@ -29,7 +29,7 @@ class DictionaryServiceImplTest {
 
 
     @BeforeAll
-    static void beforeEach(@Autowired MongoTemplate mongoTemplate) {
+    static void beforeAll(@Autowired MongoTemplate mongoTemplate) {
         // drop all data in the test db
         mongoTemplate.dropCollection(Dictionary.class);
 

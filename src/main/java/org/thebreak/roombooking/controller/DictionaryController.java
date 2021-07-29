@@ -41,22 +41,22 @@ public class DictionaryController {
     }
 
     @PostMapping(value = "/update")
-    public ResponseResult updateName(@RequestParam ObjectId id, String name){
+    public ResponseResult<Dictionary> update(@RequestParam ObjectId id, String name){
         return ResponseResult.success(dictionaryService.updateById(id, name));
     }
     @PostMapping(value = "/delete")
-    public ResponseResult deleteById(@RequestParam ObjectId id){
+    public ResponseResult<Dictionary> deleteById(@RequestParam ObjectId id){
         dictionaryService.deleteById(id);
         return ResponseResult.success();
     }
 
     @PostMapping(value = "/addValue")
-    public ResponseResult addValue(@RequestParam ObjectId id, String value){
+    public ResponseResult<Dictionary> addValue(@RequestParam ObjectId id, String value){
         return ResponseResult.success(dictionaryService.addValueById(id, value));
     }
 
     @PostMapping(value = "/deleteValue")
-    public ResponseResult deleteValue(@RequestParam ObjectId id, String value){
+    public ResponseResult<Dictionary> deleteValue(@RequestParam ObjectId id, String value){
         return ResponseResult.success(dictionaryService.deleteValue(id, value));
     }
 

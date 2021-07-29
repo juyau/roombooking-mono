@@ -25,9 +25,6 @@ public class ResponseResult<T>  {
     }
     public static <T> ResponseResult<T> success(T data){
         ResponseResult<T> responseResult = new ResponseResult<>(CommonCode.SUCCESS);
-//        responseResult.setSuccess(true);
-//        responseResult.setCode(CommonCode.SUCCESS.getCode());
-//        responseResult.setMessage(CommonCode.SUCCESS.getMessage());
         responseResult.setData(data);
         return responseResult;
     }
@@ -37,11 +34,8 @@ public class ResponseResult<T>  {
     }
 
     public static <T> ResponseResult<T> fail(){
-        ResponseResult<T> responseResult = new ResponseResult<>(CommonCode.FAILED);
-//        responseResult.setSuccess(false);
-//        responseResult.setCode(resultCode.getCode());
-//        responseResult.setMessage(resultCode.getMessage());
-        return responseResult;
+
+        return new ResponseResult<>(CommonCode.FAILED);
     }
 
     public static <T> ResponseResult<T> fail(String message){

@@ -32,6 +32,7 @@ public class DictionaryServiceImpl implements DictionaryService {
 
         // Check if dictionary name already exists;
         Query query = new Query().addCriteria(Criteria.where("name").is(name));
+
         Dictionary dictionary = dictionaryDao.findByName(query);
 
         if(null != dictionary){
