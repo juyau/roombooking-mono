@@ -160,9 +160,9 @@ public class DictionaryServiceImpl implements DictionaryService {
         }
         DeleteResult deleteResult = dictionaryDao.delete(dictionary);
         if(deleteResult.getDeletedCount() <= 0){
-            return CommonCode.FAILED;
+            CustomException.cast(CommonCode.DB_DELETE_FAILED);
         }
-        return CommonCode.SUCCESS;
+        return null;
     }
 
 }

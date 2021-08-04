@@ -93,6 +93,18 @@ class DictionaryControllerAcceptanceTest {
     }
 
     @Test
+    void findDictionaryById_shouldThrow_InvalidId() throws Exception{
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/dict/byId").param("id", "randomStringIdHere"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(CommonCode.INVALID_PARAM.getMessage()))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.success").value(CommonCode.INVALID_PARAM.getSuccess()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.code").value(CommonCode.INVALID_PARAM.getCode()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data").isEmpty());
+
+    }
+
+    @Test
     void addDictionary_shouldReturnAddedDictionary() throws Exception{
 
         mockMvc.perform(MockMvcRequestBuilders.post("/dict/add").queryParam("name","name2"))

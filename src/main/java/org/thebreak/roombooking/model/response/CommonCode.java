@@ -6,14 +6,15 @@ public enum CommonCode{
     FAILED(false, 9999, "Operation failed."),
 
     // system
-    SYSTEM_ERROR(false, 9999, "system error."),
+    SYSTEM_ERROR(false, 9000, "system error."),
 
-    INVALID_PARAM(false, 3002, "parameter not valid."),
+    INVALID_PARAM(false, 3000, "parameter not valid."),
 
     // database access code
     DB_ENTRY_ALREADY_EXIST(false, 3001, "entry already exist."),
     DB_EMPTY_LIST(true, 3002, "query list result is empty."),
-    DB_ENTRY_NOT_FOUND(false, 3003, "data entry not exist.");
+    DB_DELETE_FAILED(false, 3003, "failed to delete entry."),
+    DB_ENTRY_NOT_FOUND(false, 3004, "data entry not exist.");
 
     private final int code;
     private final String message;

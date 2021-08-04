@@ -1,18 +1,21 @@
 package org.thebreak.roombooking.controller;
 
 import org.bson.types.ObjectId;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.thebreak.roombooking.model.response.ResponseResult;
 import org.thebreak.roombooking.model.Dictionary;
+import org.thebreak.roombooking.model.vo.DictionaryVO;
 import org.thebreak.roombooking.service.DictionaryService;
 import org.thebreak.roombooking.service.impl.DictionaryServiceImpl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 @CrossOrigin
-@RequestMapping(value = "dict")
+@RequestMapping(value = "api/v1/dict")
 public class DictionaryController {
     @Autowired
     private DictionaryService dictionaryService;
@@ -26,13 +29,23 @@ public class DictionaryController {
     }
 
     @GetMapping(value = "/list")
-    public ResponseResult<List<Dictionary>> listDictionary(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "5")int size){
-        return ResponseResult.success(dictionaryService.listDictionary(page, size));
+    public ResponseResult<List<DictionaryVO>> listDictionary(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "5")int size){
+        List<Dictionary> list = dictionaryService.listDictionary(page, size);
+        List<DictionaryVO> voList = new ArrayList<>();
+        for (Dictionary dictionary : list) {
+            DictionaryVO dictionaryVO = new DictionaryVO();
+            BeanUtils.copyProperties(dictionary, dictionaryVO);
+            voList.add(dictionaryVO);
+        }
+        return ResponseResult.success(voList);
     }
 
     @GetMapping(value = "/byName")
-    public ResponseResult<Dictionary> findByName(@RequestParam String name){
-        return ResponseResult.success(dictionaryService.findByName(name));
+    public ResponseResult<DictionaryVO> findByName(@RequestParam String name){
+        Dictionary dictionary = dictionaryService.findByName(name);
+        DictionaryVO dictionaryVO = new DictionaryVO();
+        BeanUtils.copyProperties(dictionary, dictionaryVO);
+        return ResponseResult.success(dictionaryVO);
     }
 
     @GetMapping(value = "/byId")
@@ -51,13 +64,17 @@ public class DictionaryController {
     }
 
     @PostMapping(value = "/addValue")
-    public ResponseResult<Dictionary> addValue(@RequestParam ObjectId id, String value){
-        return ResponseResult.success(dictionaryService.addValueById(id, value));
+    public ResponseResult<DictionaryVO> addValue(@RequestParam ObjectId id, String value){
+        DictionaryVO dictionaryVO = new DictionaryVO();
+        BeanUtils.copyProperties(dictionaryService.addValueById(id, value), dictionaryVO);
+        return ResponseResult.success(dictionaryVO);
     }
 
     @PostMapping(value = "/deleteValue")
-    public ResponseResult<Dictionary> deleteValue(@RequestParam ObjectId id, String value){
-        return ResponseResult.success(dictionaryService.deleteValue(id, value));
+    public ResponseResult<DictionaryVO> deleteValue(@RequestParam ObjectId id, String value){
+        DictionaryVO dictionaryVO = new DictionaryVO();
+        BeanUtils.copyProperties(dictionaryService.deleteValue(id, value), dictionaryVO);
+        return ResponseResult.success(dictionaryVO);
     }
 
 }

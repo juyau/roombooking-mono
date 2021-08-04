@@ -20,7 +20,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class DictionaryServiceImplTest {
+class DictionaryServiceImplIntTest {
 
     @Resource
     private DictionaryService dictionaryService;

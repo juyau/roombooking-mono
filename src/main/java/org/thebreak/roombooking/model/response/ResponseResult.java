@@ -34,8 +34,7 @@ public class ResponseResult<T>  {
     }
 
     public static <T> ResponseResult<T> fail(){
-
-        return new ResponseResult<>(CommonCode.FAILED);
+        return new ResponseResult<>(CommonCode.SYSTEM_ERROR);
     }
 
     public static <T> ResponseResult<T> fail(String message){

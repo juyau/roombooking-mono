@@ -54,7 +54,7 @@ public class GlobalExceptionHandler {
 
         e.printStackTrace();
 
-        return ResponseResult.fail(e.getMessage());
+        return ResponseResult.fail();
     }
 
 }
