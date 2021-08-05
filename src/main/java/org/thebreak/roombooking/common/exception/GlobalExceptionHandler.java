@@ -1,8 +1,11 @@
 package org.thebreak.roombooking.common.exception;
 
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -10,7 +13,10 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.thebreak.roombooking.model.response.CommonCode;
 import org.thebreak.roombooking.model.response.ResponseResult;
 
+import javax.sound.sampled.Line;
+
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
 //    @ExceptionHandler(value = HttpRequestMethodNotSupportedException.class)
@@ -22,11 +28,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = CustomException.class)
     public ResponseResult customExceptions(CustomException e){
+        log.error(e.getCommonCode().getMessage());
         return new ResponseResult(e.getCommonCode());
     }
 
     @ExceptionHandler(value = Exception.class)
-    public ResponseResult allOtherExceptions(Exception e){
+    public ResponseResult<CommonCode> allOtherExceptions(Exception e){
 
         // missing request body;
         if(e instanceof HttpMessageNotReadableException){
@@ -34,21 +41,30 @@ public class GlobalExceptionHandler {
         }
 
 
+        if(e instanceof IllegalArgumentException){
+            System.out.println(e.getMessage() + "IllegalArgumentException");
+            return ResponseResult.fail(e.getMessage());
+        }
+
+        // param type not match, such as ObjectId length or type not match;
+        if(e instanceof MissingServletRequestParameterException){
+            return ResponseResult.fail(e.getMessage());
+        }
+
         // param type not match, such as ObjectId length or type not match;
         if(e instanceof MethodArgumentTypeMismatchException){
-            System.out.println("MethodArgumentTypeMismatchException");
+            System.out.println(e.getMessage() + "MethodArgumentTypeMismatchException");
             return ResponseResult.fail(CommonCode.INVALID_PARAM.getMessage());
         }
 
         // http method not supported; - - need to check
         if(e instanceof MethodArgumentNotValidException){
-            System.out.println("MethodArgumentNotValidException");
+            System.out.println(e.getMessage() + "MethodArgumentNotValidException");
             return ResponseResult.fail(e.getMessage());
         }
 
          // http method not supported;
         if(e instanceof HttpRequestMethodNotSupportedException){
-            System.out.println("HttpRequestMethodNotSupportedException");
             return ResponseResult.fail(e.getMessage());
         }
 

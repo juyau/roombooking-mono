@@ -15,11 +15,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.*;
 
+import org.thebreak.roombooking.common.Constants;
 import org.thebreak.roombooking.common.exception.CustomException;
 import org.thebreak.roombooking.dao.RoomRepository;
 import org.thebreak.roombooking.model.Room;
 import org.thebreak.roombooking.model.response.CommonCode;
-
+import org.thebreak.roombooking.service.impl.RoomServiceImpl;
 
 
 import java.util.ArrayList;
@@ -32,7 +33,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 class RoomServiceTest {
 
     @InjectMocks
-    RoomService roomService;  // dependencies with @Mock annotation will be injected to this service
+    RoomServiceImpl roomService;  // dependencies with @Mock annotation will be injected to this service
 
     @Mock
     RoomRepository repository;
@@ -97,18 +98,42 @@ class RoomServiceTest {
         when(repository.findAll(any(Pageable.class))).thenReturn(pagedRooms);
 
         // controller default is page=1, size=5 if no params provided;
-        List<Room> findRoomList = roomService.findPage(2, 2);
+        List<Room> findRoomList = roomService.findPage(1, 10);
 
-        assertThat(findRoomList.size()).isEqualTo(4);
+        // check that the repository method is called with correct page and size;
 
         //use pageCaptor to capture the arguments called with
         verify(repository).findAll(pageCaptor.capture());
         // get the captured pageable arguments
         Pageable page = pageCaptor.getValue();
         // verify that the page and size
-        assertThat(page.getPageNumber()).isEqualTo(1);
-        assertThat(page.getPageSize()).isEqualTo(2);
+        assertThat(page.getPageNumber()).isEqualTo(0);
+        assertThat(page.getPageSize()).isEqualTo(10);
     }
+
+    @Test
+    void listRooms_withSizeExceedingMaxSizeLimit_shouldUseDefinedMaxSize() {
+        List<Room> roomList = getRoomList();
+
+        // use PageImpl to create paged room list;
+        Page<Room> pagedRooms = new PageImpl(roomList);
+
+        when(repository.findAll(any(Pageable.class))).thenReturn(pagedRooms);
+
+        // pass in a size bigger than Max size (50)
+        List<Room> findRoomList = roomService.findPage(1, 200);
+
+        // check that the repository method is called with max size limit;
+        //use pageCaptor to capture the arguments called with
+        verify(repository).findAll(pageCaptor.capture());
+        // get the captured pageable arguments
+        Pageable page = pageCaptor.getValue();
+        // verify that the page and size
+        assertThat(page.getPageNumber()).isEqualTo(0);
+        assertThat(page.getPageSize()).isEqualTo(Constants.MAX_PAGE_SIZE);
+    }
+
+
 
     private List<Room> getRoomList() {
         List<Room> roomList = new ArrayList<>();

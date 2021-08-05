@@ -1,6 +1,7 @@
 package org.thebreak.roombooking.service.impl;
 
 import com.mongodb.client.result.DeleteResult;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Slf4j
 public class DictionaryServiceImpl implements DictionaryService {
     @Autowired
     private DictionaryDao  dictionaryDao;
@@ -26,6 +28,9 @@ public class DictionaryServiceImpl implements DictionaryService {
 
     @Override
     public Dictionary addDictionary(String name){
+
+        log.info("From logger : [" + this.getClass().getName() + "] is called");
+
         if(name.isEmpty()){
             CustomException.cast(CommonCode.INVALID_PARAM);
         }
@@ -110,7 +115,6 @@ public class DictionaryServiceImpl implements DictionaryService {
             size = 100;
         }
         page = page -1;
-
 
         // list by page and size; default sort by ascending;
         Pageable pageable = PageRequest.of(page, size);

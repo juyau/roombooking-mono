@@ -7,7 +7,6 @@ public enum CommonCode{
 
     // system
     SYSTEM_ERROR(false, 9000, "system error."),
-
     INVALID_PARAM(false, 3000, "parameter not valid."),
 
     // database access code
