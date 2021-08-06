@@ -8,8 +8,5 @@ import org.thebreak.roombooking.model.Room;
 
 @Repository
 public interface RoomRepository extends MongoRepository<Room, String> {
-    Room findByName(String name);
-
-    @Override
-    Page<Room> findAll(Pageable pageable);
+    Room findByAddressAndRoomNumber(String title, Integer roomNumber);
 }

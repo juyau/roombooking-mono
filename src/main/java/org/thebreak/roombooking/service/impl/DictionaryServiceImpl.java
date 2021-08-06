@@ -1,29 +1,29 @@
 package org.thebreak.roombooking.service.impl;
 
-import com.mongodb.client.result.DeleteResult;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
+import org.thebreak.roombooking.common.Constants;
 import org.thebreak.roombooking.common.exception.CustomException;
 import org.thebreak.roombooking.model.Dictionary;
 import org.thebreak.roombooking.model.response.CommonCode;
-import org.thebreak.roombooking.dao.DictionaryDao;
+import org.thebreak.roombooking.dao.DictionaryRepository;
 import org.thebreak.roombooking.service.DictionaryService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
 public class DictionaryServiceImpl implements DictionaryService {
     @Autowired
-    private DictionaryDao  dictionaryDao;
+    private DictionaryRepository dictionaryRepository;
 
 
     @Override
@@ -35,10 +35,9 @@ public class DictionaryServiceImpl implements DictionaryService {
             CustomException.cast(CommonCode.INVALID_PARAM);
         }
 
-        // Check if dictionary name already exists;
-        Query query = new Query().addCriteria(Criteria.where("name").is(name));
 
-        Dictionary dictionary = dictionaryDao.findByName(query);
+        Dictionary dictionary;
+        dictionary = dictionaryRepository.findByName(name);
 
         if(null != dictionary){
             CustomException.cast(CommonCode.DB_ENTRY_ALREADY_EXIST);
@@ -50,18 +49,16 @@ public class DictionaryServiceImpl implements DictionaryService {
         List<String> values = new ArrayList<>();
         dictionary1.setValues(values);
 
-        return dictionaryDao.save(dictionary1);
+        return dictionaryRepository.save(dictionary1);
     }
 
     @Override
-    public Dictionary updateById(ObjectId id, String name) {
+    public Dictionary updateById(String id, String name) {
 
         // check if id exist;
         Dictionary dictionary = this.findById(id);
 
-        // check if new dname already exist;
-        Query query = new Query().addCriteria(Criteria.where("name").is(name));
-        Dictionary dictionary1 = dictionaryDao.findByName(query);
+        Dictionary dictionary1 = dictionaryRepository.findByName(name);
 
         if(dictionary1 != null){
             CustomException.cast(CommonCode.DB_ENTRY_ALREADY_EXIST);
@@ -69,11 +66,11 @@ public class DictionaryServiceImpl implements DictionaryService {
 
         dictionary.setName(name);
 
-        return dictionaryDao.save(dictionary);
+        return dictionaryRepository.save(dictionary);
     }
 
     @Override
-    public Dictionary addValueById(ObjectId id, String value) {
+    public Dictionary addValueById(String id, String value) {
 
         // check if dictionary exist, if not, findById method will throw exception;
         Dictionary dictionary = this.findById(id);
@@ -86,11 +83,11 @@ public class DictionaryServiceImpl implements DictionaryService {
         }
         dictionary.getValues().add(value);
 
-        return dictionaryDao.save(dictionary);
+        return dictionaryRepository.save(dictionary);
     }
 
     @Override
-    public Dictionary deleteValue(ObjectId id, String value) {
+    public Dictionary deleteValue(String id, String value) {
         // check if dictionary exist, if not, findById method will throw exception;
         Dictionary dictionary = this.findById(id);
 
@@ -101,45 +98,46 @@ public class DictionaryServiceImpl implements DictionaryService {
 
         dictionary.getValues().removeIf(value1 -> value1.equals(value));
 
-        return dictionaryDao.save(dictionary);
+        return dictionaryRepository.save(dictionary);
     }
 
     @Override
-    public List<Dictionary> listDictionary(int page, int size ){
+    public Page<Dictionary> findPage(Integer page, Integer size ){
 
-        // mongo page start with 0;
-        if(page < 1){
+        if(page == null || page < 1){
             page = 1;
         }
-        if(size > 100){
-            size = 100;
-        }
+        // mongo page start with 0;
         page = page -1;
 
-        // list by page and size; default sort by ascending;
-        Pageable pageable = PageRequest.of(page, size);
-        Query query = new Query();
-        query.with(pageable).with(Sort.by("dname").ascending());
-        List<Dictionary> list = dictionaryDao.listDictionaries(query);
+        if(size == null){
+            size = Constants.DEFAULT_PAGE_SIZE;
+        }
+        if(size > Constants.MAX_PAGE_SIZE){
+            size = Constants.MAX_PAGE_SIZE;
+        }
 
-        // check if target not exist or list is empty;
-        if(list == null){
+        // dictPage by page and size; default sort by ascending;
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+
+        Page<Dictionary> dictPage = dictionaryRepository.findAll(pageable);
+
+
+        // check if target not exist or dictPage is empty;
+        if(dictPage == null){
             CustomException.cast(CommonCode.DB_ENTRY_NOT_FOUND);
         }
-        if(list.size() == 0 ){
+        if(dictPage.getContent().size() == 0 ){
             CustomException.cast(CommonCode.DB_EMPTY_LIST);
         }
-        return list;
+        return dictPage;
     }
 
 
     @Override
     public Dictionary findByName(String name){
 
-        Query query = new Query();
-        query.addCriteria(Criteria.where("name").is(name));
-
-        Dictionary dict = dictionaryDao.findByName(query);
+        Dictionary dict = dictionaryRepository.findByName(name);
 
         if(dict == null){
             CustomException.cast(CommonCode.DB_ENTRY_NOT_FOUND);
@@ -147,26 +145,24 @@ public class DictionaryServiceImpl implements DictionaryService {
         return dict;
     }
 
+
     @Override
-    public Dictionary findById(ObjectId id) {
-        Dictionary dictionary = dictionaryDao.findById(id);
-        if(dictionary == null){
+    public Dictionary findById(String id) {
+        Optional<Dictionary> optional = dictionaryRepository.findById(id);
+        if(!optional.isPresent()){
             CustomException.cast(CommonCode.DB_ENTRY_NOT_FOUND);
         }
-        return dictionary;
+        return optional.get();
     }
 
     @Override
-    public CommonCode deleteById(ObjectId id) {
+    public void deleteById(String id) {
         Dictionary dictionary = this.findById(id);
         if(dictionary == null){
             CustomException.cast(CommonCode.DB_ENTRY_NOT_FOUND);
         }
-        DeleteResult deleteResult = dictionaryDao.delete(dictionary);
-        if(deleteResult.getDeletedCount() <= 0){
-            CustomException.cast(CommonCode.DB_DELETE_FAILED);
-        }
-        return null;
+
+        dictionaryRepository.delete(dictionary);
     }
 
 }

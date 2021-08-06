@@ -1,5 +1,6 @@
 package org.thebreak.roombooking.model.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -10,6 +11,7 @@ public class ResponseResult<T>  {
     private Boolean success;
     private int code;
     private String message;
+    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     private LocalDateTime timestamp;
     private T data;
 

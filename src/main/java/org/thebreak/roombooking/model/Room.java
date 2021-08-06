@@ -25,23 +25,26 @@ import java.util.List;
 @Data
 public class Room extends BaseEntity {
 
-    @Field("name")
+    @Field("title")
     @NotEmpty
-    @Size(min = 3, max = 50, message = "name must be between 3 to 50 characters.")
-    private String name;
+    @Size(min = 3, max = 300, message = "title must be between 3 to 300 characters.")
+    private String title;
 
-    @Field("type")
+    @Field("address")
     @NotEmpty
-    private String type;
+    private String address;
+
+    @Field("room_number")
+    @NotEmpty
+    private Integer roomNumber;
+
+//    @Field("type")
+//    @NotEmpty
+//    private String type;
 
 //    @Field("city")
 //    private String city;
-//
-//    @Field("address")
-//    private String address;
-//
-//    @Field("room_number")
-//    private int roomNumber;
+
 
 //    @Field("description")
 //    private String description;
