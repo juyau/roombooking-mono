@@ -1,10 +1,10 @@
 package org.thebreak.roombooking.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.bson.types.ObjectId;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 import org.thebreak.roombooking.model.response.PageResult;
 import org.thebreak.roombooking.model.response.ResponseResult;
@@ -18,7 +18,7 @@ import java.util.List;
 @RestController
 @CrossOrigin
 @Slf4j
-@RequestMapping(value = "api/v1/dict")
+@RequestMapping(value = "api/v1/dicts")
 public class DictionaryController {
     @Autowired
     private DictionaryService dictionaryService;
@@ -31,13 +31,8 @@ public class DictionaryController {
         return ResponseResult.success(d);
     }
 
-    @GetMapping(value = "")
-    public ResponseResult<PageResult<List<DictionaryVO>>> findPage(
-            @RequestParam Integer page,
-            @RequestParam Integer size){
-
-        log.info("From logger : addDictionary controller called.");
-
+    @GetMapping()
+    public ResponseResult<PageResult<DictionaryVO>> findPage(@RequestParam @Nullable Integer page, @RequestParam @Nullable Integer size){
         Page<Dictionary> dictPage = dictionaryService.findPage(page, size);
         List<DictionaryVO> voList = new ArrayList<>();
         for (Dictionary dictionary : dictPage.getContent()) {
@@ -46,14 +41,8 @@ public class DictionaryController {
             voList.add(dictionaryVO);
         }
 
-        // assemble page result with page info
-        PageResult<List<DictionaryVO>> pageResult = new PageResult<>();
-        pageResult.setTotalRows(dictPage.getTotalElements());
-        pageResult.setPageSize(dictPage.getSize());                // request page size
-        pageResult.setTotalPages(dictPage.getTotalPages());
-        pageResult.setContentSize(dictPage.getNumberOfElements());  // actual content size returned
-        pageResult.setCurrentPage(dictPage.getNumber() + 1);       // mongo start with 0, so need to add 1
-        pageResult.setContent(voList);
+        // assemble page result
+        PageResult<DictionaryVO> pageResult = new PageResult<>(dictPage, voList);
 
         return ResponseResult.success(pageResult);
     }
@@ -71,12 +60,12 @@ public class DictionaryController {
         return ResponseResult.success(dictionaryService.findById(id));
     }
 
-    @PostMapping(value = "/update")
+    @PutMapping(value = "/update")
     public ResponseResult<Dictionary> update(@RequestParam String id, String name){
         return ResponseResult.success(dictionaryService.updateById(id, name));
     }
-    @PostMapping(value = "/delete")
-    public ResponseResult<Dictionary> deleteById(@RequestParam String id){
+    @DeleteMapping(value = "/delete/{id}")
+    public ResponseResult<Dictionary> deleteById(@PathVariable String id){
         dictionaryService.deleteById(id);
         return ResponseResult.success();
     }
@@ -88,7 +77,7 @@ public class DictionaryController {
         return ResponseResult.success(dictionaryVO);
     }
 
-    @PostMapping(value = "/deleteValue")
+    @DeleteMapping(value = "/deleteValue")
     public ResponseResult<DictionaryVO> deleteValue(@RequestParam String id, String value){
         DictionaryVO dictionaryVO = new DictionaryVO();
         BeanUtils.copyProperties(dictionaryService.deleteValue(id, value), dictionaryVO);

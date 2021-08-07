@@ -7,11 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
-import org.thebreak.roombooking.model.Dictionary;
 import org.thebreak.roombooking.model.Room;
+import org.thebreak.roombooking.model.response.CommonCode;
 import org.thebreak.roombooking.model.response.PageResult;
 import org.thebreak.roombooking.model.response.ResponseResult;
-import org.thebreak.roombooking.model.vo.DictionaryVO;
 import org.thebreak.roombooking.model.vo.RoomVO;
 import org.thebreak.roombooking.service.RoomService;
 
@@ -26,29 +25,9 @@ public class RoomController {
     @Autowired
     private RoomService roomService;
 
-//    @GetMapping(value = "")
-//    public ResponseResult<List<RoomVO>> findRoomsPage(
-//            @RequestParam @Nullable Integer page,
-//            @RequestParam @Nullable Integer size){
-//        System.out.println(page);
-//        System.out.println(size);
-//
-//        List<Room> roomList = roomService.findPage(page, size);
-//
-//        List<RoomVO> voList = new ArrayList<>();
-//        for (Room room : roomList) {
-//            RoomVO roomVO = new RoomVO();
-//            BeanUtils.copyProperties(room, roomVO);
-//            voList.add(roomVO);
-//        }
-//
-//        return ResponseResult.success(voList);
-//    }
-
-    @GetMapping(value = "")
-    public ResponseResult<PageResult<List<RoomVO>>> findRoomsPage(
-            @RequestParam @Nullable Integer page, @RequestParam @Nullable Integer size){
-
+    @GetMapping()
+    public ResponseResult<PageResult<RoomVO>> findRoomsPage(@RequestParam @Nullable Integer page,
+                                                            @RequestParam @Nullable Integer size){
         Page<Room> roomPage = roomService.findPage(page, size);
 
         // map the list content to VO list
@@ -59,30 +38,40 @@ public class RoomController {
             BeanUtils.copyProperties(room, roomVO);
             voList.add(roomVO);
         }
-
-        // assemble page result with page info
-        PageResult<List<RoomVO>> pageResult = new PageResult<>();
-        pageResult.setTotalRows(roomPage.getTotalElements());
-        pageResult.setPageSize(roomPage.getSize());                // request page size
-        pageResult.setTotalPages(roomPage.getTotalPages());
-        pageResult.setContentSize(roomPage.getNumberOfElements());  // actual content size returned
-        pageResult.setCurrentPage(roomPage.getNumber() + 1);       // mongo start with 0, so need to add 1
-
-
-        pageResult.setContent(voList);
+        // assemble pageResult
+        PageResult<RoomVO> pageResult = new PageResult<>(roomPage, voList);
 
         return ResponseResult.success(pageResult);
     }
 
+    @GetMapping(value = "/byId/{id}")
+    public ResponseResult<RoomVO> getById(@PathVariable String id){
+        Room r = roomService.findById(id);
+        RoomVO roomVO = new RoomVO();
+        BeanUtils.copyProperties(r, roomVO);
+        return ResponseResult.success(roomVO);
+    }
+
     @PostMapping(value = "/add")
     public ResponseResult<RoomVO> addRoom(@RequestBody Room room){
-
         Room r = roomService.add(room);
         RoomVO roomVO = new RoomVO();
         BeanUtils.copyProperties(r, roomVO);
-
-        log.debug("Room added.");
-
         return ResponseResult.success(roomVO);
+    }
+
+    @PutMapping(value = "/update")
+    public ResponseResult<RoomVO> getById(@RequestBody Room room){
+        Room r = roomService.update(room);
+        RoomVO roomVO = new RoomVO();
+        BeanUtils.copyProperties(r, roomVO);
+        return ResponseResult.success(roomVO);
+    }
+
+    @DeleteMapping(value = "/delete/{id}")
+    public ResponseResult<CommonCode> deleteRoomById(@PathVariable @Nullable String id){
+        roomService.deleteById(id);
+        log.debug("Room added.");
+        return ResponseResult.success();
     }
 }

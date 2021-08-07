@@ -1,7 +1,7 @@
 package org.thebreak.roombooking.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import org.bson.types.ObjectId;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -10,9 +10,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.thebreak.roombooking.common.Constants;
 import org.thebreak.roombooking.common.exception.CustomException;
+import org.thebreak.roombooking.dao.DictionaryRepository;
 import org.thebreak.roombooking.model.Dictionary;
 import org.thebreak.roombooking.model.response.CommonCode;
-import org.thebreak.roombooking.dao.DictionaryRepository;
 import org.thebreak.roombooking.service.DictionaryService;
 
 import java.util.ArrayList;
@@ -29,15 +29,9 @@ public class DictionaryServiceImpl implements DictionaryService {
     @Override
     public Dictionary addDictionary(String name){
 
-        log.info("From logger : [" + this.getClass().getName() + "] is called");
+        checkNullOrEmpty(name);
 
-        if(name.isEmpty()){
-            CustomException.cast(CommonCode.INVALID_PARAM);
-        }
-
-
-        Dictionary dictionary;
-        dictionary = dictionaryRepository.findByName(name);
+        Dictionary dictionary = dictionaryRepository.findByName(name);
 
         if(null != dictionary){
             CustomException.cast(CommonCode.DB_ENTRY_ALREADY_EXIST);
@@ -55,6 +49,8 @@ public class DictionaryServiceImpl implements DictionaryService {
     @Override
     public Dictionary updateById(String id, String name) {
 
+        checkNullOrEmpty(id);
+        checkNullOrEmpty(name);
         // check if id exist;
         Dictionary dictionary = this.findById(id);
 
@@ -103,7 +99,6 @@ public class DictionaryServiceImpl implements DictionaryService {
 
     @Override
     public Page<Dictionary> findPage(Integer page, Integer size ){
-
         if(page == null || page < 1){
             page = 1;
         }
@@ -122,7 +117,6 @@ public class DictionaryServiceImpl implements DictionaryService {
 
         Page<Dictionary> dictPage = dictionaryRepository.findAll(pageable);
 
-
         // check if target not exist or dictPage is empty;
         if(dictPage == null){
             CustomException.cast(CommonCode.DB_ENTRY_NOT_FOUND);
@@ -133,10 +127,9 @@ public class DictionaryServiceImpl implements DictionaryService {
         return dictPage;
     }
 
-
     @Override
     public Dictionary findByName(String name){
-
+        checkNullOrEmpty(name);
         Dictionary dict = dictionaryRepository.findByName(name);
 
         if(dict == null){
@@ -145,9 +138,9 @@ public class DictionaryServiceImpl implements DictionaryService {
         return dict;
     }
 
-
     @Override
     public Dictionary findById(String id) {
+        checkNullOrEmpty(id);
         Optional<Dictionary> optional = dictionaryRepository.findById(id);
         if(!optional.isPresent()){
             CustomException.cast(CommonCode.DB_ENTRY_NOT_FOUND);
@@ -157,12 +150,21 @@ public class DictionaryServiceImpl implements DictionaryService {
 
     @Override
     public void deleteById(String id) {
+        checkNullOrEmpty(id);
         Dictionary dictionary = this.findById(id);
         if(dictionary == null){
             CustomException.cast(CommonCode.DB_ENTRY_NOT_FOUND);
         }
 
-        dictionaryRepository.delete(dictionary);
+        dictionaryRepository.deleteById(id);
     }
 
+    private void checkNullOrEmpty(String string) {
+        if(string == null){
+            CustomException.cast(CommonCode.REQUEST_FIELD_MISSING);
+        }
+        if( StringUtils.isEmpty(string)){
+            CustomException.cast(CommonCode.REQUEST_FIELD_EMPTY);
+        }
+    }
 }

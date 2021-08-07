@@ -1,11 +1,10 @@
 package org.thebreak.roombooking.model.response;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import org.springframework.data.domain.Page;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -15,9 +14,17 @@ public class PageResult<T> {
     private int pageSize;       // request page size
     private int contentSize;    // actual returned content size
     private int currentPage;
-    private T content;
+    private List<T> content;
 
-    public PageResult() {
+
+    public PageResult(Page page, List<T> list) {
+        this.totalRows = page.getTotalElements();
+        this.pageSize = page.getSize();
+        this.totalPages = page.getTotalPages();
+        this.contentSize = page.getNumberOfElements();
+        this.currentPage = page.getNumber() + 1;
+        this.content = list;
 
     }
+
 }
