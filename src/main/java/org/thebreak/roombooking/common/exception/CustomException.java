@@ -1,6 +1,6 @@
 package org.thebreak.roombooking.common.exception;
 
-import org.thebreak.roombooking.model.response.CommonCode;
+import org.thebreak.roombooking.common.response.CommonCode;
 
 public class CustomException extends RuntimeException{
 

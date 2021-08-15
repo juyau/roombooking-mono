@@ -13,7 +13,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.thebreak.roombooking.common.Constants;
 import org.thebreak.roombooking.model.Room;
-import org.thebreak.roombooking.model.response.CommonCode;
+import org.thebreak.roombooking.common.response.CommonCode;
 
 import static org.hamcrest.Matchers.is;
 

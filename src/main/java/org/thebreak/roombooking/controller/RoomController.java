@@ -1,16 +1,21 @@
 package org.thebreak.roombooking.controller;
 
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.info.Info;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
+import org.thebreak.roombooking.common.response.CommonCode;
+import org.thebreak.roombooking.common.response.PageResult;
+import org.thebreak.roombooking.common.response.ResponseResult;
 import org.thebreak.roombooking.model.Room;
-import org.thebreak.roombooking.model.response.CommonCode;
-import org.thebreak.roombooking.model.response.PageResult;
-import org.thebreak.roombooking.model.response.ResponseResult;
+import org.thebreak.roombooking.model.vo.RoomPreviewVO;
 import org.thebreak.roombooking.model.vo.RoomVO;
 import org.thebreak.roombooking.service.RoomService;
 
@@ -20,30 +25,36 @@ import java.util.List;
 @RestController
 @CrossOrigin
 @Slf4j
+@OpenAPIDefinition(info = @Info(title = "Room Controller", description = "Controller for Room operations"))
 @RequestMapping(value = "api/v1/rooms")
 public class RoomController {
     @Autowired
     private RoomService roomService;
 
     @GetMapping()
-    public ResponseResult<PageResult<RoomVO>> findRoomsPage(@RequestParam @Nullable Integer page,
-                                                            @RequestParam @Nullable Integer size){
+    @Operation(summary = "Get rooms",
+            description = "Get paged list of rooms, default is page 1 and size 10 if not provided.")
+    public ResponseResult<PageResult<RoomPreviewVO>> findRoomsPage(
+            @RequestParam @Nullable @Parameter(description = "default is 1 if not provided") Integer page,
+            @RequestParam @Nullable @Parameter(description = "Max limited to 50, default is 10 if not provided") Integer size){
         Page<Room> roomPage = roomService.findPage(page, size);
 
         // map the list content to VO list
         List<Room> roomList = roomPage.getContent();
-        List<RoomVO> voList = new ArrayList<>();
+        List<RoomPreviewVO> voList = new ArrayList<>();
         for (Room room : roomList) {
-            RoomVO roomVO = new RoomVO();
+            RoomPreviewVO roomVO = new RoomPreviewVO();
             BeanUtils.copyProperties(room, roomVO);
             voList.add(roomVO);
         }
         // assemble pageResult
-        PageResult<RoomVO> pageResult = new PageResult<>(roomPage, voList);
+        PageResult<RoomPreviewVO> pageResult = new PageResult<>(roomPage, voList);
 
         return ResponseResult.success(pageResult);
     }
 
+    @Operation(summary = "Get rooms by id",
+            description = "id provided as path variable.")
     @GetMapping(value = "/byId/{id}")
     public ResponseResult<RoomVO> getById(@PathVariable String id){
         Room r = roomService.findById(id);
@@ -53,7 +64,9 @@ public class RoomController {
     }
 
     @PostMapping(value = "/add")
-    public ResponseResult<RoomVO> addRoom(@RequestBody Room room){
+    @Operation(summary = "Add a new room",
+            description = "room address and room number cannot be the same with exist records. Note: no need to provide id")
+    public ResponseResult<RoomVO> addRoom(@RequestBody @Parameter( description = "room details, no need to provide id") Room room){
         Room r = roomService.add(room);
         RoomVO roomVO = new RoomVO();
         BeanUtils.copyProperties(r, roomVO);
@@ -61,6 +74,8 @@ public class RoomController {
     }
 
     @PutMapping(value = "/update")
+    @Operation(summary = "Update a room",
+            description = "please send over all the fields when update.")
     public ResponseResult<RoomVO> getById(@RequestBody Room room){
         Room r = roomService.update(room);
         RoomVO roomVO = new RoomVO();
@@ -69,6 +84,8 @@ public class RoomController {
     }
 
     @DeleteMapping(value = "/delete/{id}")
+    @Operation(summary = "Delete a room",
+            description = "room address provided in path variable.")
     public ResponseResult<CommonCode> deleteRoomById(@PathVariable @Nullable String id){
         roomService.deleteById(id);
         log.debug("Room added.");

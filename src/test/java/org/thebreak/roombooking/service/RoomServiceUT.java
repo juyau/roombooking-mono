@@ -16,9 +16,9 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.thebreak.roombooking.common.Constants;
 import org.thebreak.roombooking.common.exception.CustomException;
+import org.thebreak.roombooking.common.response.CommonCode;
 import org.thebreak.roombooking.dao.RoomRepository;
 import org.thebreak.roombooking.model.Room;
-import org.thebreak.roombooking.model.response.CommonCode;
 import org.thebreak.roombooking.service.impl.RoomServiceImpl;
 
 import java.util.ArrayList;

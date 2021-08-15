@@ -1,7 +1,9 @@
 package org.thebreak.roombooking.controller;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,8 +12,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.thebreak.roombooking.common.Constants;
+import org.thebreak.roombooking.common.response.CommonCode;
 import org.thebreak.roombooking.model.Dictionary;
-import org.thebreak.roombooking.model.response.CommonCode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +23,7 @@ import static org.hamcrest.Matchers.is;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@TestMethodOrder(MethodOrderer.MethodName.class)
 class DictionaryControllerIT {
 
     @Autowired
@@ -76,7 +79,7 @@ class DictionaryControllerIT {
 
     @Test
     void findDictionaryById_withValidId_shouldReturnDictionary() throws Exception{
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/dicts/byId").param("id", oId))
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/dicts/byId/" + oId))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("OK"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.success", is(true)))
@@ -88,8 +91,7 @@ class DictionaryControllerIT {
 
     @Test
     void findDictionaryById_withInvalidId_shouldThrowNotFoundException() throws Exception{
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/dicts/byId").param("id", "invalidRandomStringIdHere"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/dicts/byId/" + "invalidRandomStringIdHere"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code").value(CommonCode.DB_ENTRY_NOT_FOUND.getCode()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(CommonCode.DB_ENTRY_NOT_FOUND.getMessage()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.success", is(false)))
@@ -140,7 +142,7 @@ class DictionaryControllerIT {
     }
 
     @Test
-    void deleteDictionaryById_withValidId_shouldReturnSuccess() throws Exception{
+    void y_deleteDictionaryById_withValidId_shouldReturnSuccess() throws Exception{
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/dicts/delete/" + oId))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.success", is(true)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code", is(CommonCode.SUCCESS.getCode())))
@@ -149,7 +151,7 @@ class DictionaryControllerIT {
     }
 
     @Test
-    void deleteDictionaryById_withInValidId_shouldThrowNotFoundException() throws Exception{
+    void y_deleteDictionaryById_withInValidId_shouldThrowNotFoundException() throws Exception{
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/dicts/delete/" + "thisIsNotExistOrAlreadyDeletedId"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.success", is(false)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code", is(CommonCode.DB_ENTRY_NOT_FOUND.getCode())))

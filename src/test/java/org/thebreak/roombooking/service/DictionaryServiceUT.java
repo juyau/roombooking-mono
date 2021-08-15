@@ -19,7 +19,7 @@ import org.thebreak.roombooking.common.Constants;
 import org.thebreak.roombooking.common.exception.CustomException;
 import org.thebreak.roombooking.dao.DictionaryRepository;
 import org.thebreak.roombooking.model.Dictionary;
-import org.thebreak.roombooking.model.response.CommonCode;
+import org.thebreak.roombooking.common.response.CommonCode;
 import org.thebreak.roombooking.service.impl.DictionaryServiceImpl;
 
 import java.util.ArrayList;

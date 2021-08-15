@@ -10,9 +10,10 @@ import org.thebreak.roombooking.common.Constants;
 import org.thebreak.roombooking.common.exception.CustomException;
 import org.thebreak.roombooking.dao.RoomRepository;
 import org.thebreak.roombooking.model.Room;
-import org.thebreak.roombooking.model.response.CommonCode;
+import org.thebreak.roombooking.common.response.CommonCode;
 import org.thebreak.roombooking.service.RoomService;
 
+import java.lang.reflect.Field;
 import java.util.Optional;
 
 @Service
@@ -21,9 +22,9 @@ public class RoomServiceImpl implements RoomService {
     RoomRepository repository;
 
     public Room add(Room room) {
-        if(room == null){
-            CustomException.cast(CommonCode.REQUEST_FIELD_MISSING);
-        }
+//        if(room == null){
+//            CustomException.cast(CommonCode.REQUEST_FIELD_MISSING);
+//        }
         if(room.getTitle() == null || room.getAddress() == null || room.getRoomNumber() == null ){
             CustomException.cast(CommonCode.REQUEST_FIELD_MISSING);
         }
@@ -102,13 +103,20 @@ public class RoomServiceImpl implements RoomService {
                 || null == room.getRoomNumber()){
             CustomException.cast(CommonCode.REQUEST_FIELD_MISSING);
         }
-        if(!repository.findById(room.getId()).isPresent()){
+
+        Optional<Room> optional = repository.findById(room.getId());
+        if(!optional.isPresent()){
             CustomException.cast(CommonCode.DB_ENTRY_NOT_FOUND);
         };
 
-        if(repository.findByAddressAndRoomNumber(room.getAddress(),room.getRoomNumber()) != null){
-            CustomException.cast(CommonCode.ROOM_ENTRY_ALREADY_EXIST);
-        }
+        // to implement update ignore null fields
+        Room roomReturn = optional.get();
+        java.lang.reflect.Field[] fields = room.getClass().getDeclaredFields();
+
+        for(Field field: fields) {
+            System.out.println(field.getName());
+           }
+
         return repository.save(room);
     }
 }

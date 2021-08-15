@@ -1,4 +1,4 @@
-package org.thebreak.roombooking.model.response;
+package org.thebreak.roombooking.common.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;

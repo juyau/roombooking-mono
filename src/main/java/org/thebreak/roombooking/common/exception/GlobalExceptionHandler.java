@@ -1,19 +1,18 @@
 package org.thebreak.roombooking.common.exception;
 
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-import org.thebreak.roombooking.model.response.CommonCode;
-import org.thebreak.roombooking.model.response.ResponseResult;
+import org.thebreak.roombooking.common.response.CommonCode;
+import org.thebreak.roombooking.common.response.ResponseResult;
 
-import javax.sound.sampled.Line;
+import java.time.DateTimeException;
+import java.util.Arrays;
 
 @RestControllerAdvice
 @Slf4j
@@ -39,7 +38,6 @@ public class GlobalExceptionHandler {
         if(e instanceof HttpMessageNotReadableException){
             return ResponseResult.fail("Required request body is missing.");
         }
-
 
         if(e instanceof IllegalArgumentException){
             System.out.println(e.getMessage() + "IllegalArgumentException");
@@ -68,6 +66,13 @@ public class GlobalExceptionHandler {
             return ResponseResult.fail(e.getMessage());
         }
 
+        // post Date time format invalid;
+        if(e instanceof DateTimeException){
+            return ResponseResult.fail(e.getMessage());
+        }
+
+
+        log.error(Arrays.toString(e.getStackTrace()));
         e.printStackTrace();
 
         return ResponseResult.fail();

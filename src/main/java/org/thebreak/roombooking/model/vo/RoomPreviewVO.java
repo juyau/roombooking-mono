@@ -12,16 +12,16 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 @AllArgsConstructor
-public class RoomVO {
+public class RoomPreviewVO {
 
     private String id;
     private String title;
     private String address;
     private Integer roomNumber;
     private String type;
-    private String availableType;
     private String city;
     private String description;
+    private String availableType;
     private int floor;
     private int size;
     private int maxPeople;

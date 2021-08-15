@@ -13,9 +13,10 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.thebreak.roombooking.common.base;
+package org.thebreak.roombooking.model;
 
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.springframework.data.annotation.*;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -31,9 +32,11 @@ public class BaseEntity implements Serializable {
 
     @CreatedDate
     @Field("created_at")
+    @Schema(hidden = true)
     private LocalDateTime createdAt;
 
     @LastModifiedDate
+    @Schema(hidden = true)
     @Field("updated_at")
     private LocalDateTime updatedAt;
 

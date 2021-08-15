@@ -1,0 +1,12 @@
+package org.thebreak.roombooking.dao;
+
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.stereotype.Repository;
+import org.thebreak.roombooking.model.Booking;
+
+import java.util.Optional;
+
+@Repository
+public interface BookingRepository extends MongoRepository<Booking, String> {
+    Optional<Booking> findById(String roomId);
+}

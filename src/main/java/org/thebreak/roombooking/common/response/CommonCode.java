@@ -1,4 +1,4 @@
-package org.thebreak.roombooking.model.response;
+package org.thebreak.roombooking.common.response;
 
 public enum CommonCode{
 
@@ -12,10 +12,22 @@ public enum CommonCode{
     // request param check
     REQUEST_FIELD_MISSING(false, 4001, "Missing required field(s)."),
     REQUEST_FIELD_EMPTY(false, 4002, "Request included empty field(s)"),
+    REQUEST_JSON_MISSING(false, 4004, "Missing required JSON data."),
+    REQUEST_ID_FIELD_MISSING(false, 4005, "id field is required."),
+    REQUEST_ID_INVALID_OR_EMPTY(false, 4006, "id is invalid or is empty."),
     REQUEST_FIELD_INVALID(false, 4003, "Request field(s) include invalid data"),
 
     // Room code
     ROOM_ENTRY_ALREADY_EXIST(false, 5001, "room with same address and room number already exist."),
+
+    // Booking code
+    BOOKING_TIME_EARLIER_THAN_NOW(false, 6001, "booking time cannot be a time in the past."),
+    BOOKING_TIME_ALREADY_TAKEN(false, 6002, "booking time is already taken by other users."),
+    BOOKING_TIMERANGE_NOTAVAILABLE(false, 6003, "booking time in the range is not available for this room."),
+    BOOKING_WEEKEND_ONLY(false, 6004, "this room is available only for weekends."),
+    BOOKING_WEEKDAY_ONLY(false, 6005, "this room is available only for weekdays."),
+    BOOKING_TIME_QUARTER_ONLY(false, 6006, "start and end time must be in quarter."),
+    BOOKING_TIME_HOURLY_ONLY(false, 6006, "booking time unit is in hour and must at least one hour."),
 
     // database access code
     DB_ENTRY_ALREADY_EXIST(false, 3001, "entry already exist."),

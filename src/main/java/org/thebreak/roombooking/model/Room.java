@@ -1,20 +1,15 @@
 package org.thebreak.roombooking.model;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
-import org.thebreak.roombooking.common.base.BaseEntity;
 
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -28,56 +23,72 @@ public class Room extends BaseEntity {
     @Field("title")
     @NotEmpty
     @Size(min = 3, max = 300, message = "title must be between 3 to 300 characters.")
+    @Schema(example = "huge party room with music and lighting for big events")
     private String title;
 
     @Field("address")
     @NotEmpty
+    @Schema(example = "77 Kings St, Chatswood, NSW")
     private String address;
 
     @Field("room_number")
     @NotEmpty
+    @Schema(example = "101")
     private Integer roomNumber;
 
-//    @Field("type")
-//    @NotEmpty
-//    private String type;
+    @Field("type")
+    @Schema(example = "Pary Room")
+    private String type;
 
-//    @Field("city")
-//    private String city;
+    @Field("available_type")
+    @Schema(example = "weekend")
+    private String availableType;
 
+    @Field("city")
+    @Schema(example = "Sydney")
+    private String city;
 
-//    @Field("description")
-//    private String description;
-//
-//    @Field("floor")
-//    private int floor;
-//
-//    @Field("size")
-//    private int size;
-//
-//    @Field("max_people")
-//    private int maxPeople;
-//
-//    @Field("price")
-//    private int price;
-//
-//    @Field("discount")
-//    private int discount;
-//
-//    @Field("rating")
-//    private int rating;
-//
-//    @Field("commentCount")
-//    private int commentCount;
-//
-//    @Field("bookedTime")
-//    private List<LocalDateTime> bookedTime;
-//
-//    @Field("images")
-//    private List<String> images;
-//
-//    @Field("facilities")
-//    private List<String> facilities;
+    @Field("description")
+    @Schema(example = "This is a huge party room with a lot of facilities, included ....")
+    private String description;
 
+    @Field("floor")
+    @Schema(example = "1")
+    private int floor;
 
+    @Field("size")
+    @Schema(example = "200 Sq")
+    private int size;
+
+    @Field("max_people")
+    @Schema(example = "50")
+    private int maxPeople;
+
+    @Field("price")
+    @Schema(example = "9999", description = "unit is in cents, need to display 99.99 in frontend")
+    private long price;
+
+    @Field("discount")
+    @Schema(example = "20")
+    private int discount;
+
+    @Field("rating")
+    @Schema(example = "4.3")
+    private int rating;
+
+    @Field("commentCount")
+    @Schema(example = "17")
+    private int commentCount;
+
+    @Field("images")
+    private List<String> images;
+
+    @Field("facilities")
+    private List<String> facilities;
+
+    public Room(@NotEmpty @Size(min = 3, max = 300, message = "title must be between 3 to 300 characters.") String title, @NotEmpty String address, @NotEmpty Integer roomNumber) {
+        this.title = title;
+        this.address = address;
+        this.roomNumber = roomNumber;
+    }
 }

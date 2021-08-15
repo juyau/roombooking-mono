@@ -1,4 +1,4 @@
-package org.thebreak.roombooking.model.response;
+package org.thebreak.roombooking.common.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
