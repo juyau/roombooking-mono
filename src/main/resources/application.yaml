@@ -8,10 +8,10 @@ spring:
       database: roombooking
       #when using docker deployment, mongodb host is not localhost any more; it need to match the mongo container name
 #      host: mongoDocker
+
+      # this is only for local mac use
       host: localhost
       #following only for local Mac docker mymongo, need to remove for aws
       username: root
       password: root
       authentication-database: admin
-
-

@@ -4,13 +4,11 @@ package org.thebreak.roombooking.controller;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.thebreak.roombooking.common.response.ResponseResult;
-import org.thebreak.roombooking.model.BookingTimeRange;
-import org.thebreak.roombooking.model.Booking;
-
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 
 @RestController
 @CrossOrigin
@@ -25,14 +23,4 @@ public class TestController {
         return ResponseResult.success("Hello from roombooking server...");
     }
 
-    @GetMapping(value = "/testbooking/{roomId}")
-    public ResponseResult<Booking> testPlaceOrder(@PathVariable String roomId, @RequestBody BookingTimeRange timeRange){
-        ZonedDateTime zdt = ZonedDateTime.now(ZoneId.of("Australia/Sydney"));
-
-        System.out.println(zdt);
-        ZonedDateTime zdtPerth = ZonedDateTime.now(ZoneId.of("Australia/Perth"));
-        System.out.println(zdtPerth);
-
-        return ResponseResult.success();
-    }
 }

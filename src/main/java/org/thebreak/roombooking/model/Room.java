@@ -21,18 +21,15 @@ import java.util.List;
 public class Room extends BaseEntity {
 
     @Field("title")
-    @NotEmpty
     @Size(min = 3, max = 300, message = "title must be between 3 to 300 characters.")
     @Schema(example = "huge party room with music and lighting for big events")
     private String title;
 
     @Field("address")
-    @NotEmpty
     @Schema(example = "77 Kings St, Chatswood, NSW")
     private String address;
 
     @Field("room_number")
-    @NotEmpty
     @Schema(example = "101")
     private Integer roomNumber;
 
@@ -73,11 +70,11 @@ public class Room extends BaseEntity {
     private int discount;
 
     @Field("rating")
-    @Schema(example = "4.3")
+    @Schema(example = "4.3", description = "this field is calculated and updated automatically in backend")
     private int rating;
 
     @Field("commentCount")
-    @Schema(example = "17")
+    @Schema(example = "17", description = "this field is calculated updated automatically in backend")
     private int commentCount;
 
     @Field("images")

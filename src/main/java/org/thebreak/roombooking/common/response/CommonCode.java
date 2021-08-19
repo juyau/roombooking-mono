@@ -28,6 +28,8 @@ public enum CommonCode{
     BOOKING_WEEKDAY_ONLY(false, 6005, "this room is available only for weekdays."),
     BOOKING_TIME_QUARTER_ONLY(false, 6006, "start and end time must be in quarter."),
     BOOKING_TIME_HOURLY_ONLY(false, 6006, "booking time unit is in hour and must at least one hour."),
+    BOOKING_END_BEFORE_START(false, 6007, "booking end time must later than start time."),
+    BOOKING_PAID_WITHOUT_AMOUNT(false, 6008, "must provide positive paidAmount when change status to paid."),
 
     // database access code
     DB_ENTRY_ALREADY_EXIST(false, 3001, "entry already exist."),

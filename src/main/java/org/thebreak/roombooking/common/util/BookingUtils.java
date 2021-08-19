@@ -5,6 +5,10 @@ import java.time.temporal.ChronoUnit;
 
 public class BookingUtils {
 
+    public static String getStringCapitalized(String str){
+        return str.trim().substring(0, 1).toUpperCase() + str.trim().substring(1).toLowerCase();
+    }
+
     public static LocalDateTime getNowAtZonedCity(String city){
         String cityCapitalized = city.trim().substring(0, 1).toUpperCase() + city.trim().substring(1).toLowerCase();
         String targetCityZone = "Australia/" + cityCapitalized;

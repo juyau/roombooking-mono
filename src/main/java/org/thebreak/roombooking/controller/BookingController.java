@@ -21,8 +21,7 @@ import org.thebreak.roombooking.model.vo.BookingPreviewVO;
 import org.thebreak.roombooking.model.vo.BookingVO;
 import org.thebreak.roombooking.service.BookingService;
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,8 +42,23 @@ public class BookingController {
         return ResponseResult.success(b);
     }
 
+
+    @PutMapping(value = "/updateStatus")
+    @Operation(summary = "update booking status by id",
+            description = "provide booking id and new status string, paidAmount optional")
+    public ResponseResult<BookingVO> updateStatusById(
+            @RequestParam @Parameter( description = "booking id") String id,
+            @Parameter( description = "status to be updated to") String status,
+            @Parameter( description = "paidAmount in Long") @Nullable Long paidAmount
+    ){
+        Booking b = bookingService.updateStatusById(id, status, paidAmount);
+        BookingVO bookingVO = new BookingVO();
+        BeanUtils.copyProperties(b, bookingVO);
+        return ResponseResult.success(bookingVO);
+    }
+
     @GetMapping()
-    @Operation(summary = "Get bookings",
+    @Operation(summary = "Get all bookings for all rooms, included history bookings",
             description = "Get paged list of bookings, default is page 1 and size 10 if not provided.")
     public ResponseResult<PageResult<BookingVO>> findBookingsPage(
             @RequestParam @Nullable @Parameter(description = "default is 1 if not provided") Integer page,
@@ -65,32 +79,45 @@ public class BookingController {
         return ResponseResult.success(pageResult);
     }
 
+    @GetMapping("byUser")
+    @Operation(summary = "Get all bookings for specific user",
+            description = "Get paged list of bookings, default is page 1 if not provided, size is fixed to 10.")
+    public ResponseResult<PageResult<BookingVO>> findPageByUser(
+            @RequestParam @NotNull @Parameter(description = "default is 1 if not provided") String userId,
+            @RequestParam @Nullable @Parameter(description = "default size is fixed to 10") Integer page){
+        Page<Booking> bookingsPage = bookingService.findPageByUser(userId, page);
+
+        // map the list content to VO list
+        List<Booking> bookingList = bookingsPage.getContent();
+        List<BookingVO> voList = new ArrayList<>();
+        for (Booking booking : bookingList) {
+            BookingVO bookingVO = new BookingVO();
+            BeanUtils.copyProperties(booking, bookingVO);
+            voList.add(bookingVO);
+        }
+        // assemble pageResult
+        PageResult<BookingVO> pageResult = new PageResult<>(bookingsPage, voList);
+
+        return ResponseResult.success(pageResult);
+    }
+
     @Operation(summary = "Get booking detail by id",
             description = "id provided as path variable.")
     @GetMapping(value = "/byId/{id}")
-    public ResponseResult<BookingVO> getById(@PathVariable String id){
+    public ResponseResult<BookingVO> getById(@PathVariable @NotNull String id){
         Booking b = bookingService.findById(id);
         BookingVO bookingVO = new BookingVO();
         BeanUtils.copyProperties(b, bookingVO);
         return ResponseResult.success(bookingVO);
     }
 
-    @GetMapping(value = "/test/{id}")
-    public ResponseResult<List<BookingTimeRange>> getTest(@PathVariable String id){
-        List<BookingTimeRange> b = bookingService.findFutureBookedTimesByRoom(id, "sydney");
-
-        return ResponseResult.success(b);
+    @Operation(summary = "Get future booking for a specific room detail by room id",
+            description = "id provided as path variable.")
+    @GetMapping(value = "/getRoomFutureBookings/{id}")
+    public ResponseResult<List<BookingTimeRange>> findFutureBookedTimesByRoomId(@PathVariable @NotNull String id){
+        List<BookingTimeRange> list = bookingService.findFutureBookedTimesByRoom(id, null);
+        return ResponseResult.success(list);
     }
-
-    @GetMapping(value = "/getZdt")
-    public ResponseResult<ZonedDateTime> getTest(){
-//        ZonedDateTime zdt = ZonedDateTime.now();
-//        ZonedDateTime zdt = ZonedDateTime.now(ZoneId.of("UTC"));
-        ZonedDateTime zdt = ZonedDateTime.now(ZoneId.of("Australia/Sydney"));
-
-        return ResponseResult.success(zdt);
-    }
-
 
     @PutMapping(value = "/update")
     @Operation(summary = "Update a booking",
@@ -105,7 +132,7 @@ public class BookingController {
     @DeleteMapping(value = "/delete/{id}")
     @Operation(summary = "Delete a booking",
             description = "booking id provided in path variable.")
-    public ResponseResult<CommonCode> deleteById(@PathVariable @Nullable String id){
+    public ResponseResult<CommonCode> deleteById(@PathVariable @NotNull String id){
         bookingService.deleteById(id);
         log.debug("Booking deleted.");
         return ResponseResult.success();

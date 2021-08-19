@@ -4,10 +4,13 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import org.thebreak.roombooking.common.AvailableTypeEnum;
 import org.thebreak.roombooking.common.BookingStatusEnum;
@@ -23,6 +26,7 @@ import org.thebreak.roombooking.model.Room;
 import org.thebreak.roombooking.model.bo.BookingBO;
 import org.thebreak.roombooking.model.vo.BookingPreviewVO;
 import org.thebreak.roombooking.service.BookingService;
+import org.thebreak.roombooking.service.RoomService;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -37,6 +41,9 @@ public class BookingServiceImpl implements BookingService {
 
     @Autowired
     RoomRepository roomRepository;
+
+    @Autowired
+    RoomService roomService;
 
 
     @Override
@@ -61,6 +68,11 @@ public class BookingServiceImpl implements BookingService {
 
             LocalDateTime start = bookingTimeRange.getStart();
             LocalDateTime end = bookingTimeRange.getEnd();
+
+            // 0. check end time must later than start time
+            if(!end.isAfter(start)){
+                CustomException.cast(CommonCode.BOOKING_END_BEFORE_START);
+            }
 
             // 1. check start or end time must later than current time
             if(!BookingUtils.checkBookingTimeAfterNow(start, room.getCity())){
@@ -95,6 +107,31 @@ public class BookingServiceImpl implements BookingService {
                 CustomException.cast(CommonCode.BOOKING_TIME_HOURLY_ONLY);
             }
 
+            // 5. check booking time has not been booked by other users.
+            List<BookingTimeRange> futureBookedTimesByRoom = findFutureBookedTimesByRoom(room.getId(),room.getCity());
+            for (BookingTimeRange timeRange : futureBookedTimesByRoom) {
+                // check start time is not between the booked time
+                if(start.isAfter(timeRange.getStart()) && start.isBefore(timeRange.getEnd())){
+                    CustomException.cast(CommonCode.BOOKING_TIME_ALREADY_TAKEN);
+                }
+                // check end time is not between the booked time
+                if(end.isAfter(timeRange.getStart()) && end.isBefore(timeRange.getEnd())){
+                    CustomException.cast(CommonCode.BOOKING_TIME_ALREADY_TAKEN);
+                }
+                // check the booking time range is not covering any booked time
+                if(start.isBefore(timeRange.getStart()) && end.isAfter(timeRange.getEnd())){
+                    CustomException.cast(CommonCode.BOOKING_TIME_ALREADY_TAKEN);
+                }
+                // check the booking time range is not inside any other booked time
+                if(start.isAfter(timeRange.getStart()) && end.isBefore(timeRange.getEnd())){
+                    CustomException.cast(CommonCode.BOOKING_TIME_ALREADY_TAKEN);
+                }
+                // check the booking time is exactly the same as any other booked time
+                if(start.isEqual(timeRange.getStart()) || end.isEqual(timeRange.getEnd())){
+                    CustomException.cast(CommonCode.BOOKING_TIME_ALREADY_TAKEN);
+                }
+            }
+
             // get hourly duration of each booking
             long bookingHours = BookingUtils.getBookingHours(start, end);
             totalBookedHours += bookingHours;
@@ -102,13 +139,13 @@ public class BookingServiceImpl implements BookingService {
         }
 
 
-        String userId = "fakeUserIdFromAuth";
+        String userId = "userId001";
         String status = BookingStatusEnum.UNPAID.getDescription();
 
         Booking booking = new Booking();
         booking.setBookedAt(bookedAtUTC);
         booking.setTotalHours(totalBookedHours);
-        booking.setPaidAmount(0);
+        booking.setPaidAmount(0L);
         booking.setRoom(room);
         booking.setStatus(status);
         booking.setUserId(userId);
@@ -147,13 +184,15 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<BookingTimeRange> findFutureBookedTimesByRoom(String roomId, String city) {
-//        roomId = "61177303c4d79b4693762b7b";"2021-08-21T19:15+11:00"
+        if(city == null){
+            Room room = roomService.findById(roomId);
+            city = room.getCity();
+        }
 
-        LocalDateTime nowAtZonedCity = BookingUtils.getNowAtZonedCity(city).plusDays(7);
+        LocalDateTime nowAtZonedCity = BookingUtils.getNowAtZonedCity(city);
         LocalDateTime after7days = nowAtZonedCity.plusDays(7);
 
         Query query = new Query();
-//        query.addCriteria(Criteria.where("room.id").is(roomId)).addCriteria(Criteria.where("room.bookedTime").all("start").is("2021-08-21T19:15+11:00"));
         query.addCriteria(Criteria.where("room.id").is(roomId))
                 .addCriteria(Criteria.where("bookedTime").elemMatch(Criteria.where("end").gt(nowAtZonedCity)))
                 .fields().include("bookedTime");
@@ -214,6 +253,25 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    public Page<Booking> findPageByUser(String userId, Integer page) {
+        if(page == null || page < 1){
+            page = 1;
+        }
+        // mongo page start with 0;
+        page = page -1;
+
+        Pageable pageable = PageRequest.of(page, Constants.DEFAULT_PAGE_SIZE, Sort.by("updatedAt").descending());
+
+        Page<Booking> bookingsPage = repository.findByUserId(userId, pageable);
+
+        if(bookingsPage.getContent().size() == 0 ){
+            CustomException.cast(CommonCode.DB_EMPTY_LIST);
+        }
+
+        return bookingsPage;
+    }
+
+    @Override
     public void deleteById(String id) {
         if(id == null) {
             CustomException.cast(CommonCode.REQUEST_FIELD_MISSING);
@@ -232,11 +290,27 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public Booking updateById(Booking booking) {
-        return null;
+        if(booking == null){
+            CustomException.cast(CommonCode.REQUEST_FIELD_MISSING);
+        }
+        if(null == booking.getId()){
+            CustomException.cast(CommonCode.REQUEST_FIELD_MISSING);
+        }
+
+        Optional<Booking> optional = repository.findById(booking.getId());
+        if(!optional.isPresent()){
+            CustomException.cast(CommonCode.DB_ENTRY_NOT_FOUND);
+        };
+
+        // TODO to implement update ignore null fields
+        Booking roomReturn = optional.get();
+
+        return repository.save(booking);
+
     }
 
     @Override
-    public Booking updateStatusById(String id, String status) {
+    public Booking updateStatusById(String id, String status, Long paidAmount) {
         if(id == null || status == null){
             CustomException.cast(CommonCode.REQUEST_FIELD_MISSING);
         }
@@ -244,16 +318,27 @@ public class BookingServiceImpl implements BookingService {
             CustomException.cast(CommonCode.REQUEST_FIELD_MISSING);
         }
 
-        Optional<Booking> optional = repository.findById(id);
-        if(!optional.isPresent()){
-            CustomException.cast(CommonCode.DB_ENTRY_NOT_FOUND);
-        };
+        // TODO check status param is one of the status constant;
+        String capitalizedStatus = BookingUtils.getStringCapitalized(status);
 
-        // to implement update ignore null fields
-        Booking roomReturn = optional.get();
+        // if status to be paid, need to provide amount > 0
+        if(capitalizedStatus.equals("Paid") && paidAmount == null || paidAmount <= 0){
+            CustomException.cast(CommonCode.BOOKING_PAID_WITHOUT_AMOUNT);
+        }
+
+        Query query = new Query().addCriteria(Criteria.where("id").is(id));
+        Update update = new Update().set("status", capitalizedStatus);
+        if(capitalizedStatus.equals("Paid")){
+            update.set("paidAmount", paidAmount);
+        }
+        Booking updatedBooking = mongoTemplate.update(Booking.class)
+                .matching(query)
+                .apply(update)
+                .withOptions(FindAndModifyOptions.options().returnNew(true))
+                .findAndModifyValue();
 
 
-        return repository.save(roomReturn);
+        return updatedBooking;
 
     }
 }

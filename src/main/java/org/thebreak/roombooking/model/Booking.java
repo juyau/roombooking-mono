@@ -41,7 +41,7 @@ public class Booking extends BaseEntity {
 
     @Field("paid_amount")
     @Schema(example = "19999")
-    private long paidAmount;
+    private Long paidAmount;
 
     @Field("booked_at")
     private LocalDateTime bookedAt;

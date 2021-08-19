@@ -12,8 +12,10 @@ public interface BookingService {
     BookingPreviewVO add(BookingBO bookingBO);
     Booking findById(String id);
     Page<Booking> findPage(Integer page, Integer size);
+    Page<Booking> findPageByUser(String userId, Integer page);
     void deleteById(String id);
     Booking updateById(Booking booking);
+    // param city can not null, if null, will get city value from db query
     List<BookingTimeRange> findFutureBookedTimesByRoom(String roomId, String city);
-    Booking updateStatusById(String id, String status);
+    Booking updateStatusById(String id, String status, Long paidAmount);
 }

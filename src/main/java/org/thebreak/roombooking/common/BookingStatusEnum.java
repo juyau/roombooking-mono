@@ -2,10 +2,10 @@ package org.thebreak.roombooking.common;
 
 public enum BookingStatusEnum {
 
-    UNPAID(1, "unpaid"),
+    UNPAID(1, "Unpaid"),
     PAID(2,  "Paid"),
     FINISHED(3,  "Finished"),
-    CANCELLED(4,  "cancelled"),
+    CANCELLED(4,  "Cancelled"),
     REFUNDED(5,  "Refunded");
 
     private final int code;

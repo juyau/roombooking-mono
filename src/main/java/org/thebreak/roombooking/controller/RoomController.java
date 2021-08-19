@@ -14,11 +14,15 @@ import org.springframework.web.bind.annotation.*;
 import org.thebreak.roombooking.common.response.CommonCode;
 import org.thebreak.roombooking.common.response.PageResult;
 import org.thebreak.roombooking.common.response.ResponseResult;
+import org.thebreak.roombooking.model.BookingTimeRange;
 import org.thebreak.roombooking.model.Room;
 import org.thebreak.roombooking.model.vo.RoomPreviewVO;
 import org.thebreak.roombooking.model.vo.RoomVO;
+import org.thebreak.roombooking.model.vo.RoomWithBookedTimeVO;
+import org.thebreak.roombooking.service.BookingService;
 import org.thebreak.roombooking.service.RoomService;
 
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +34,9 @@ import java.util.List;
 public class RoomController {
     @Autowired
     private RoomService roomService;
+
+    @Autowired
+    private BookingService bookingService;
 
     @GetMapping()
     @Operation(summary = "Get rooms",
@@ -60,6 +67,18 @@ public class RoomController {
         Room r = roomService.findById(id);
         RoomVO roomVO = new RoomVO();
         BeanUtils.copyProperties(r, roomVO);
+        return ResponseResult.success(roomVO);
+    }
+
+    @Operation(summary = "Get rooms with future booked times",
+            description = "full room detail plus future bookedTime list")
+    @GetMapping(value = "/withBookedTime/{id}")
+    public ResponseResult<RoomWithBookedTimeVO> getRoomWithFutureBookedTime(@PathVariable @NotNull String id){
+        Room r = roomService.findById(id);
+        List<BookingTimeRange> bookedTimeList = bookingService.findFutureBookedTimesByRoom(id, r.getCity());
+        RoomWithBookedTimeVO roomVO = new RoomWithBookedTimeVO();
+        BeanUtils.copyProperties(r, roomVO);
+        roomVO.setBookedTime(bookedTimeList);
         return ResponseResult.success(roomVO);
     }
 
