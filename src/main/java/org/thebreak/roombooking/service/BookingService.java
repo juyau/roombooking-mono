@@ -13,6 +13,7 @@ public interface BookingService {
     Booking findById(String id);
     Page<Booking> findPage(Integer page, Integer size);
     Page<Booking> findPageByUser(String userId, Integer page);
+    Page<Booking> findPageActiveBookings(Integer page, Integer size);
     void deleteById(String id);
     Booking updateById(Booking booking);
     // param city can not null, if null, will get city value from db query

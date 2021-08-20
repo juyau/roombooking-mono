@@ -27,6 +27,8 @@ public class DictionaryController {
 
 
     @PostMapping(value = "/add")
+    @Operation(summary = "add new dictionary entry",
+            description = "add the dictionary name first and than add values separately.")
     public ResponseResult<DictionaryVO> addDictionary(@RequestParam String name){
         Dictionary dictionary = dictionaryService.addDictionary(name);
         DictionaryVO dictionaryVO = new DictionaryVO();
@@ -84,12 +86,16 @@ public class DictionaryController {
         return ResponseResult.success(dictionaryVO);
     }
     @DeleteMapping(value = "/delete/{id}")
+    @Operation(summary = "delete dictionary by id",
+            description = "delete dictionary by id.")
     public ResponseResult<?> deleteById(@PathVariable String id){
         dictionaryService.deleteById(id);
         return ResponseResult.success();
     }
 
     @PostMapping(value = "/addValue")
+    @Operation(summary = "add a new value in to exist dictionary",
+            description = "add one value in a time, into dictionary query by id.")
     public ResponseResult<DictionaryVO> addValue(@RequestParam String id, String value){
         DictionaryVO dictionaryVO = new DictionaryVO();
         BeanUtils.copyProperties(dictionaryService.addValueById(id, value), dictionaryVO);
@@ -97,6 +103,8 @@ public class DictionaryController {
     }
 
     @DeleteMapping(value = "/deleteValue")
+    @Operation(summary = "delete a value in exist dictionary",
+            description = "delete one value in a time, into dictionary query by id.")
     public ResponseResult<DictionaryVO> deleteValue(@RequestParam String id, String value){
         DictionaryVO dictionaryVO = new DictionaryVO();
         BeanUtils.copyProperties(dictionaryService.deleteValue(id, value), dictionaryVO);

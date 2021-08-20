@@ -79,6 +79,29 @@ public class BookingController {
         return ResponseResult.success(pageResult);
     }
 
+    @GetMapping("/getActive")
+    @Operation(summary = "Get active bookings(status is Paid or Unpaid)",
+            description = "Get paged list of active bookings, default is page 1 and size 10 if not provided.")
+    public ResponseResult<PageResult<BookingVO>> findPageActiveBookings(
+            @RequestParam @Nullable @Parameter(description = "default is 1 if not provided") Integer page,
+            @RequestParam @Nullable @Parameter(description = "Max limited to 50, default is 10 if not provided") Integer size){
+        Page<Booking> bookingsPage = bookingService.findPageActiveBookings(page, size);
+
+        // map the list content to VO list
+        List<Booking> bookingList = bookingsPage.getContent();
+        List<BookingVO> voList = new ArrayList<>();
+        for (Booking booking : bookingList) {
+            BookingVO bookingVO = new BookingVO();
+            BeanUtils.copyProperties(booking, bookingVO);
+            voList.add(bookingVO);
+        }
+        // assemble pageResult
+        PageResult<BookingVO> pageResult = new PageResult<>(bookingsPage, voList);
+
+        return ResponseResult.success(pageResult);
+    }
+
+
     @GetMapping("byUser")
     @Operation(summary = "Get all bookings for specific user",
             description = "Get paged list of bookings, default is page 1 if not provided, size is fixed to 10.")

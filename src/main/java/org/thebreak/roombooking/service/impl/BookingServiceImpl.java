@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Service;
 import org.thebreak.roombooking.common.AvailableTypeEnum;
 import org.thebreak.roombooking.common.BookingStatusEnum;
@@ -267,6 +268,37 @@ public class BookingServiceImpl implements BookingService {
         if(bookingsPage.getContent().size() == 0 ){
             CustomException.cast(CommonCode.DB_EMPTY_LIST);
         }
+
+        return bookingsPage;
+    }
+
+    @Override
+    public Page<Booking> findPageActiveBookings(Integer page, Integer size) {
+        if(page == null || page < 1){
+            page = 1;
+        }
+        // mongo page start with 0;
+        page = page -1;
+
+        if(size == null){
+            size = Constants.DEFAULT_PAGE_SIZE;
+        }
+        if(size > Constants.MAX_PAGE_SIZE){
+            size = Constants.MAX_PAGE_SIZE;
+        }
+
+
+        Query query = new Query();
+        query.addCriteria(Criteria.where("status").in("Paid", "Unpaid"));
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("bookedAt").descending());
+
+        List<Booking> list = mongoTemplate.find(query, Booking.class);
+        // MongoTemplate does not have built in Page, have to use PageableExecutionUtils from spring data
+        Page<Booking> bookingsPage = PageableExecutionUtils.getPage(
+                list,
+                pageable,
+                () -> mongoTemplate.count(query, Booking.class));
 
         return bookingsPage;
     }

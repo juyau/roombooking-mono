@@ -10,9 +10,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.thebreak.roombooking.common.Constants;
 import org.thebreak.roombooking.common.exception.CustomException;
+import org.thebreak.roombooking.common.response.CommonCode;
 import org.thebreak.roombooking.dao.DictionaryRepository;
 import org.thebreak.roombooking.model.Dictionary;
-import org.thebreak.roombooking.common.response.CommonCode;
 import org.thebreak.roombooking.service.DictionaryService;
 
 import java.util.ArrayList;
@@ -31,7 +31,7 @@ public class DictionaryServiceImpl implements DictionaryService {
 
         checkNullOrEmpty(name);
 
-        Dictionary dictionary = dictionaryRepository.findByName(name);
+        Dictionary dictionary = dictionaryRepository.findByName(name.toLowerCase());
 
         if(null != dictionary){
             CustomException.cast(CommonCode.DB_ENTRY_ALREADY_EXIST);

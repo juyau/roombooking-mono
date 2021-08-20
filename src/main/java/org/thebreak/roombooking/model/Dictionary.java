@@ -23,7 +23,11 @@ public class Dictionary extends BaseEntity {
     private String name;
 
     @Field("values")
-    @Schema(example = "Sydney, Melbourne, Brisbane")
+    @Schema(example = "[\n" +
+            "                    \"sydney\",\n" +
+            "                    \"melbourne\",\n" +
+            "                    \"brisbane\",\n" +
+            "                ]")
     private List<String> values;
 
 }
