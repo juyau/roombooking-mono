@@ -2,11 +2,14 @@ package org.thebreak.roombooking.controller;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.thebreak.roombooking.service.BookingService;
+import org.thebreak.roombooking.service.MailSenderService;
 
+import javax.mail.MessagingException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -19,9 +22,27 @@ class TestControllerIT {
     @Autowired
     private BookingService bookingService;
 
+    @Value("${braintree.ENVIRONMENT}")
+    private String environment;
+
     @Autowired
     private MongoTemplate mongoTemplate;
 
+    @Autowired
+    private MailSenderService mailSenderService;
+
+    @Test
+    void testEmail() throws MessagingException {
+//        mailSenderService.sendSMimiMessage("samuelju2017@gmail.com","Test Mime", "Ryan Ju", "Thank you for blablabla...");
+        LocalDateTime time = LocalDateTime.now();
+        mailSenderService.sendBookingConfirmEmailNotification("samuelju2017@gmail.com", "Aria Ju", "Huge party room at lake side",time,5, 1999);
+    }
+
+    @Test
+    void name() {
+        System.out.println(environment);
+
+    }
 
     @Test
     void cityToLocalTime() {

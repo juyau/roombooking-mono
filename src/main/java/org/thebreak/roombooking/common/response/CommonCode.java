@@ -30,6 +30,9 @@ public enum CommonCode{
     BOOKING_TIME_HOURLY_ONLY(false, 6006, "booking time unit is in hour and must at least one hour."),
     BOOKING_END_BEFORE_START(false, 6007, "booking end time must later than start time."),
     BOOKING_PAID_WITHOUT_AMOUNT(false, 6008, "must provide positive paidAmount when change status to paid."),
+    BOOKING_CONTACT_NOTNULL(false, 6009, "contact name, email, mobile are all required."),
+    BOOKING_EMAIL_INVALID(false, 6010, "email invalid."),
+    BOOKING_SENDEMAIL_FAILED(false, 6011, "failed to send notification email."),
 
     // database access code
     DB_ENTRY_ALREADY_EXIST(false, 3001, "entry already exist."),

@@ -1,5 +1,6 @@
 package org.thebreak.roombooking.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,11 +21,13 @@ import org.thebreak.roombooking.service.RoomService;
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class RoomServiceImpl implements RoomService {
     @Autowired
     RoomRepository repository;
 
     public Room add(Room room) {
+        log.debug("RoomService start to add room...");
         if(room == null){
             CustomException.cast(CommonCode.REQUEST_FIELD_MISSING);
         }

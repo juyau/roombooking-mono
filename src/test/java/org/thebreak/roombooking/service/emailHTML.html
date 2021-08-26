@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <p>Hi, <span style="font-weight: bold">{username}</span></p>
+    <p>Thank you for booking at TheBreak!</p>
+    <p>your booking for: </p>
+    <p>Room: <span>roomTitle</span></p>
+    <p>Total of <span style="font-weight: bold">totalHours</span> starting at <span style="font-weight: bold">startDateTime</span> with total amount of $ <span style="color: darkred">totalPrice</span></p>
+    <p>is successful, please process the payment within 30 minutes. Unpaid bookings will be cancelled automatically after 30 minutes.</p>
+
+    <p>Hi, <span style='font-weight: bold'>" + username + "</span></p>\n" +
+    "    <p>Thank you for booking at TheBreak!</p>\n" +
+    "    <p>your booking for: </p>\n" +
+    "    <div style="background-color: lightskyblue; border-left: 3px solid blue; padding: 8px"><p>Room: <span>" + roomTitle + "</span></p>\n" +
+    "    <p style="margin: 8px auto">Total of <span style='font-weight: bold'> " + totalHours + "</span> starting at <span style='font-weight: bold'>"+ formatedTime +"</span> with total amount of $ <span style='color: darkred'>"+totalPrice+"</span></p></div>\n" +
+    "    <p>is successful, please process the payment within 30 minutes. Unpaid bookings will be cancelled automatically after 30 minutes.</p>" +
+    "</br>" +
+    "<p>TheBreak Room booking team</p>"
+</body>
+</html>

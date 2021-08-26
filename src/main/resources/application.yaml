@@ -1,7 +1,25 @@
 server:
   port: 8080
 
+braintree:
+  ENVIRONMENT: sandbox
+  MERCHANT_ID: 6qnmyyxzhv382x4h
+  PUBLIC_KEY: zv4wcr6q7txvwxbd
+  PRIVATE_KEY: 7f9abd76c83b6b915384a4adf06bf9fc
+
 spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: breaknotification@gmail.com
+    password: jctebdtoijjfcanu
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
   data:
     mongodb:
       port: 27017
@@ -9,9 +27,9 @@ spring:
       #when using docker deployment, mongodb host is not localhost any more; it need to match the mongo container name
 #      host: mongoDocker
 
+
       # this is only for local mac use
       host: localhost
-      #following only for local Mac docker mymongo, need to remove for aws
       username: root
       password: root
       authentication-database: admin

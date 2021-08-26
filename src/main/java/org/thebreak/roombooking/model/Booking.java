@@ -20,8 +20,16 @@ import java.util.List;
 public class Booking extends BaseEntity {
 
     @Field("user")
-    @Schema(example = "should be with detail user info, only use userId for now")
+    @Schema(example = "userIdFromKeyCloak")
     private String userId;
+
+    @Field("contact")
+    @Schema(description = "contact person info")
+    private BookingContact contact;
+
+    @Field("remark")
+    @Schema(example = "We need 2 extra white boards, thanks")
+    private String remark;
 
     @Field("room")
     @Schema(example = "booked room detail info")
@@ -29,7 +37,11 @@ public class Booking extends BaseEntity {
 
     @Field("total_hours")
     @Schema(example = "2 (in hours)")
-    private long totalHours;
+    private long totalHours = 0L;
+
+    @Field("total_amount")
+    @Schema(example = "1999")
+    private long totalAmount = 0L;
 
     @Field("booked_time")
     @Schema(example = "example")
@@ -41,7 +53,7 @@ public class Booking extends BaseEntity {
 
     @Field("paid_amount")
     @Schema(example = "19999")
-    private Long paidAmount;
+    private Long paidAmount = 0L;
 
     @Field("booked_at")
     private LocalDateTime bookedAt;

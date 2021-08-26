@@ -39,7 +39,7 @@ public class Room extends BaseEntity {
 
     @Field("available_type")
     @Schema(example = "weekend")
-    private String availableType;
+    private String availableType = "weekend";
 
     @Field("city")
     @Schema(example = "Sydney")

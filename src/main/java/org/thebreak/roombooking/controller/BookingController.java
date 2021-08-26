@@ -21,6 +21,7 @@ import org.thebreak.roombooking.model.vo.BookingPreviewVO;
 import org.thebreak.roombooking.model.vo.BookingVO;
 import org.thebreak.roombooking.service.BookingService;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +38,7 @@ public class BookingController {
     @PostMapping(value = "/add")
     @Operation(summary = "Add a new booking",
             description = "provide roomId and list of booking range")
-    public ResponseResult<BookingPreviewVO> addBooking(@RequestBody @Parameter( description = "room details, no need to provide id") BookingBO bookingBO){
+    public ResponseResult<BookingPreviewVO> addBooking(@RequestBody @Valid @Parameter( description = "room details, no need to provide id") BookingBO bookingBO){
         BookingPreviewVO b = bookingService.add(bookingBO);
         return ResponseResult.success(b);
     }

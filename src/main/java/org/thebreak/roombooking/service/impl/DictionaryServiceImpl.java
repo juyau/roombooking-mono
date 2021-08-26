@@ -39,7 +39,7 @@ public class DictionaryServiceImpl implements DictionaryService {
 
         // Add new dictionary to db;
         Dictionary dictionary1 = new Dictionary();
-        dictionary1.setName(name);
+        dictionary1.setName(name.toLowerCase());
         List<String> values = new ArrayList<>();
         dictionary1.setValues(values);
 
@@ -54,13 +54,13 @@ public class DictionaryServiceImpl implements DictionaryService {
         // check if id exist;
         Dictionary dictionary = this.findById(id);
 
-        Dictionary dictionary1 = dictionaryRepository.findByName(name);
+        Dictionary dictionary1 = dictionaryRepository.findByName(name.toLowerCase());
 
         if(dictionary1 != null){
             CustomException.cast(CommonCode.DB_ENTRY_ALREADY_EXIST);
         }
 
-        dictionary.setName(name);
+        dictionary.setName(name.toLowerCase());
 
         return dictionaryRepository.save(dictionary);
     }
@@ -70,6 +70,7 @@ public class DictionaryServiceImpl implements DictionaryService {
 
         // check if dictionary exist, if not, findById method will throw exception;
         Dictionary dictionary = this.findById(id);
+        value = value.toLowerCase();
 
         // check if value already exist in the values list;
         for(String value1: dictionary.getValues()){
@@ -88,11 +89,11 @@ public class DictionaryServiceImpl implements DictionaryService {
         Dictionary dictionary = this.findById(id);
 
         // check if value already exist in the dValue list;
-        if(!dictionary.getValues().contains(value)){
+        if(!dictionary.getValues().contains(value.toLowerCase())){
             CustomException.cast(CommonCode.DB_ENTRY_NOT_FOUND);
         }
 
-        dictionary.getValues().removeIf(value1 -> value1.equals(value));
+        dictionary.getValues().removeIf(value1 -> value1.equals(value.toLowerCase()));
 
         return dictionaryRepository.save(dictionary);
     }
@@ -130,7 +131,7 @@ public class DictionaryServiceImpl implements DictionaryService {
     @Override
     public Dictionary findByName(String name){
         checkNullOrEmpty(name);
-        Dictionary dict = dictionaryRepository.findByName(name);
+        Dictionary dict = dictionaryRepository.findByName(name.toLowerCase());
 
         if(dict == null){
             CustomException.cast(CommonCode.DB_ENTRY_NOT_FOUND);

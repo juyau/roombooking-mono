@@ -1,5 +1,6 @@
 package org.thebreak.roombooking.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -13,6 +14,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.thebreak.roombooking.common.AvailableTypeEnum;
 import org.thebreak.roombooking.common.BookingStatusEnum;
 import org.thebreak.roombooking.common.Constants;
@@ -27,8 +29,12 @@ import org.thebreak.roombooking.model.Room;
 import org.thebreak.roombooking.model.bo.BookingBO;
 import org.thebreak.roombooking.model.vo.BookingPreviewVO;
 import org.thebreak.roombooking.service.BookingService;
+import org.thebreak.roombooking.service.MailSenderService;
 import org.thebreak.roombooking.service.RoomService;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -36,18 +42,22 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class BookingServiceImpl implements BookingService {
     @Autowired
-    BookingRepository repository;
+    private BookingRepository repository;
 
     @Autowired
-    RoomRepository roomRepository;
+    private RoomRepository roomRepository;
 
     @Autowired
-    RoomService roomService;
+    private RoomService roomService;
 
+    @Autowired
+    private MailSenderService mailSenderService;
 
     @Override
+    @Transactional
     public BookingPreviewVO add(BookingBO bookingBO) {
         checkBookingBoEmptyOrNull(bookingBO);
 
@@ -139,20 +149,40 @@ public class BookingServiceImpl implements BookingService {
 
         }
 
-
+        Long totalAmount = room.getPrice() * totalBookedHours;
         String userId = "userId001";
         String status = BookingStatusEnum.UNPAID.getDescription();
 
         Booking booking = new Booking();
         booking.setBookedAt(bookedAtUTC);
         booking.setTotalHours(totalBookedHours);
+        booking.setTotalAmount(totalAmount);
         booking.setPaidAmount(0L);
         booking.setRoom(room);
         booking.setStatus(status);
         booking.setUserId(userId);
+        booking.setContact(bookingBO.getContact());
+        booking.setRemark(bookingBO.getRemark());
         booking.setBookedTime(bookingTimeList);
 
+
+
         Booking booking1 = repository.save(booking);
+
+        // send email notification
+       log.info("BookingServiceImpl: start to send email.");
+
+        try {
+            mailSenderService.sendBookingConfirmEmailNotification(bookingBO.getContact().getEmail(),
+                    userId, room.getTitle(),bookingBO.getBookingTime().get(0).getStart(),totalBookedHours,totalAmount);
+        } catch (MessagingException e){
+//            CustomException.cast(CommonCode.BOOKING_SENDEMAIL_FAILED);
+            log.error("serviceImpl email exception");
+            log.error(e.getMessage());
+        }
+
+        // TODO implement Async email notification with MQ or other solution;
+
         BookingPreviewVO bookingPreviewVO = new BookingPreviewVO();
 
         BeanUtils.copyProperties(booking1, bookingPreviewVO);
@@ -177,6 +207,21 @@ public class BookingServiceImpl implements BookingService {
         }
         if(bookingBO.getBookingTime().isEmpty()){
             CustomException.cast(CommonCode.REQUEST_FIELD_EMPTY);
+        }
+        if(bookingBO.getContact() == null){
+            CustomException.cast(CommonCode.BOOKING_CONTACT_NOTNULL);
+        }
+
+        if(bookingBO.getContact().getEmail() == null || bookingBO.getContact().getMobile() == null || bookingBO.getContact().getName() == null){
+            CustomException.cast(CommonCode.BOOKING_CONTACT_NOTNULL);
+        }
+
+        try {
+            // use java mail to validate email format
+            InternetAddress emailAddr = new InternetAddress(bookingBO.getContact().getEmail());
+            emailAddr.validate();
+        } catch (AddressException ex) {
+            CustomException.cast(CommonCode.BOOKING_EMAIL_INVALID);
         }
     }
 

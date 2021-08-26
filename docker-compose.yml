@@ -9,7 +9,7 @@ services:
     ports:
     - 27017:27017
   roombooking:
-    image: hcoin/roombooking-server:0.0.2
+    image: hcoin/roombooking-server:0.0.3
     container_name: "roombooking"
     ports:
     - 8081:8080

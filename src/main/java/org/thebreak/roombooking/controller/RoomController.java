@@ -107,7 +107,7 @@ public class RoomController {
             description = "room address provided in path variable.")
     public ResponseResult<CommonCode> deleteRoomById(@PathVariable @Nullable String id){
         roomService.deleteById(id);
-        log.debug("Room added.");
+        log.debug("Room deleted.");
         return ResponseResult.success();
     }
 }

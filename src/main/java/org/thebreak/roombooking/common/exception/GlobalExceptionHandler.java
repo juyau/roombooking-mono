@@ -11,6 +11,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.thebreak.roombooking.common.response.CommonCode;
 import org.thebreak.roombooking.common.response.ResponseResult;
 
+import javax.mail.MessagingException;
 import java.time.DateTimeException;
 import java.util.Arrays;
 
@@ -69,6 +70,12 @@ public class GlobalExceptionHandler {
         // post Date time format invalid;
         if(e instanceof DateTimeException){
             return ResponseResult.fail(e.getMessage());
+        }
+
+        // email notification failed;
+        if(e instanceof MessagingException){
+            System.out.println("Global exception: email notification failed");
+            log.error(e.getMessage());
         }
 
 

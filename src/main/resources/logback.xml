@@ -56,7 +56,7 @@
         <appender-ref ref="SevereRollingFile"/>
     </root>
 
-    <logger name="org.thebreak.roombooking" level="debug" additivity="false">
+    <logger name="org.thebreak" level="debug" additivity="false">
         <appender-ref ref="SevereRollingFile"/>
         <appender-ref ref="RollingFile"/>
         <appender-ref ref="Console"/>
