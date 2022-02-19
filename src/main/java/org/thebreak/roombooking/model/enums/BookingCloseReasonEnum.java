@@ -1,14 +1,15 @@
 package org.thebreak.roombooking.common;
 
-public enum AvailableTypeEnum {
+public enum BookingCloseReasonEnum {
 
-    WEEKEND(1, "weekend"),
-    WEEKDAY(2,  "weekday");
+    PAYMENT_TIMEOUT(1, "Payment timeout"),
+    OVERDUE(2,  "overdue"),
+    CANCELLED(3,  "Cancelled");
 
     private final int code;
     private final String description;
 
-    AvailableTypeEnum(int code, String description){
+    BookingCloseReasonEnum(int code, String description){
         this.code = code;
         this.description = description;
     }

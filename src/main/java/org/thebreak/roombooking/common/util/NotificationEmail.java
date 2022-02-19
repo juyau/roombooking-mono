@@ -1,4 +1,4 @@
-package org.thebreak.roombooking.service;
+package org.thebreak.roombooking.common.util;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Service
-public class MailSenderService {
+public class MailSender {
     @Autowired
     private JavaMailSender javaMailSender;
 

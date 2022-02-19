@@ -4,9 +4,7 @@ public enum BookingStatusEnum {
 
     UNPAID(1, "Unpaid"),
     PAID(2,  "Paid"),
-    FINISHED(3,  "Finished"),
-    CANCELLED(4,  "Cancelled"),
-    REFUNDED(5,  "Refunded");
+    CLOSED(3,  "Closed");
 
     private final int code;
     private final String description;
